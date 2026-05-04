@@ -10,11 +10,19 @@ export const useBoards = () => {
     return context;
 };
 
-export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, setActiveBoardId }) => {
+export const BoardsProvider = ({
+    children,
+    boards,
+    setBoards,
+    activeBoardId,
+    setActiveBoardId
+}) => {
+    // Mendapatkan board aktif
     const getActiveBoard = useCallback(() => {
         return boards[activeBoardId];
     }, [boards, activeBoardId]);
 
+    // Update board tertentu
     const updateBoard = useCallback((boardId, updatedBoard) => {
         setBoards(prev => ({
             ...prev,
@@ -22,14 +30,17 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
         }));
     }, [setBoards]);
 
+    // Memindahkan task antar kolom (drag & drop)
     const moveTask = useCallback((boardId, sourceCol, destCol, sourceIndex, destIndex) => {
         setBoards(prevBoards => {
             const board = prevBoards[boardId];
+            if (!board) return prevBoards;
+
             const sourceTasks = [...board.columns[sourceCol]];
             const destTasks = sourceCol === destCol ? sourceTasks : [...board.columns[destCol]];
             const [movedTask] = sourceTasks.splice(sourceIndex, 1);
 
-            // Update task status to match destination column
+            // Update status task sesuai kolom tujuan
             const updatedTask = { ...movedTask, status: destCol };
 
             if (sourceCol === destCol) {
@@ -61,6 +72,7 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
         });
     }, [setBoards]);
 
+    // Menambah task baru ke kolom Backlog
     const addTask = useCallback((boardId, taskName) => {
         if (!taskName.trim()) return;
 
@@ -74,6 +86,8 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
 
         setBoards(prevBoards => {
             const board = prevBoards[boardId];
+            if (!board) return prevBoards;
+
             return {
                 ...prevBoards,
                 [boardId]: {
@@ -87,12 +101,16 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
         });
     }, [setBoards]);
 
+    // Mengupdate task (edit nama, status, tags, coverImage)
     const updateTask = useCallback((boardId, taskId, updatedFields) => {
         setBoards(prevBoards => {
             const board = prevBoards[boardId];
-            const columns = { ...board.columns };
+            if (!board) return prevBoards;
 
-            // Find and update the task in its column
+            const columns = { ...board.columns };
+            let taskFound = false;
+
+            // Cari task di semua kolom
             for (const [status, tasks] of Object.entries(columns)) {
                 const taskIndex = tasks.findIndex(t => t.id === taskId);
                 if (taskIndex !== -1) {
@@ -100,9 +118,12 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
                     const newTasks = [...tasks];
                     newTasks[taskIndex] = updatedTask;
                     columns[status] = newTasks;
+                    taskFound = true;
                     break;
                 }
             }
+
+            if (!taskFound) return prevBoards;
 
             return {
                 ...prevBoards,
@@ -114,6 +135,7 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
         });
     }, [setBoards]);
 
+    // Menambah board baru
     const addBoard = useCallback((boardName, logoUrl) => {
         const newBoardId = `board-${Date.now()}`;
         const newBoard = {
@@ -135,6 +157,7 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
         setActiveBoardId(newBoardId);
     }, [setBoards, setActiveBoardId]);
 
+    // Menghapus board, tidak boleh jika hanya tersisa satu
     const deleteBoard = useCallback((boardId) => {
         const boardIds = Object.keys(boards);
         if (boardIds.length <= 1) {
@@ -149,7 +172,7 @@ export const BoardsProvider = ({ children, boards, setBoards, activeBoardId, set
         });
 
         if (activeBoardId === boardId) {
-            const remainingBoardId = Object.keys(boards).find(id => id !== boardId);
+            const remainingBoardId = boardIds.find(id => id !== boardId);
             setActiveBoardId(remainingBoardId);
         }
     }, [boards, activeBoardId, setBoards, setActiveBoardId]);

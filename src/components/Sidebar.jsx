@@ -1,46 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useBoards } from '../contexts/BoardsContext';
+import BoardList from './BoardList';
 
 const Sidebar = ({ darkMode, setDarkMode }) => {
-    const [boardName, setBoardName] = useState('Default Board');
-    const [boardLogo, setBoardLogo] = useState('/resources/emojis/board-logo-01.png');
-
-    const handleAddNewBoard = () => {
-        // Simulate adding a new board (reset to default)
-        const newName = 'Default Board';
-        const emojis = [
-            '/resources/emojis/board-logo-01.png',
-            '/resources/emojis/board-logo-02.png',
-            '/resources/emojis/board-logo-03.png',
-        ];
-        const randomLogo = emojis[Math.floor(Math.random() * emojis.length)];
-        setBoardName(newName);
-        setBoardLogo(randomLogo);
-        // In a full app, you'd also reset tasks. Here we let MainContent reset via localStorage or state.
-        // For simplicity, we'll trigger a custom event or use context. We'll manage tasks in MainContent with a key.
-        window.dispatchEvent(new CustomEvent('resetBoard'));
-    };
+    const { activeBoardId, boards, setActiveBoardId } = useBoards();
+    const activeBoard = boards[activeBoardId];
 
     return (
-        <div className="w-72 bg-[#191B1F] rounded-xl flex flex-col justify-between p-4">
+        <div className="w-72 bg-dark-bg dark:bg-dark-card rounded-xl flex flex-col justify-between p-4">
             <div>
                 <button className="text-white mb-6">
                     <img src="/resources/icons/Close_round.svg" alt="close" className="w-6 h-6" />
                 </button>
 
+                {/* Board yang sedang aktif */}
                 <div className="border border-blue-500 bg-transparent rounded-lg p-3 flex items-center gap-3 mb-3">
-                    <img src={boardLogo} alt="board logo" className="w-8 h-8 rounded-full" />
-                    <span className="text-white font-medium">{boardName}</span>
+                    <img src={activeBoard?.logoUrl} alt="board logo" className="w-8 h-8 rounded-full" />
+                    <span className="text-white font-medium">{activeBoard?.name}</span>
                 </div>
 
-                <button
-                    onClick={handleAddNewBoard}
-                    className="w-full flex items-center gap-3 p-3 text-gray-400 hover:text-white transition"
-                >
-                    <img src="/resources/icons/Add_round.svg" alt="add" className="w-5 h-5" />
-                    <span>Add new board</span>
-                </button>
+                {/* Daftar semua board */}
+                <BoardList />
             </div>
 
+            {/* Toggle tema */}
             <div className="bg-[#3A3E44] rounded-lg p-2 flex gap-2">
                 <button
                     onClick={() => setDarkMode(true)}
