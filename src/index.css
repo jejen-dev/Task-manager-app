@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply font-sans transition-colors duration-300;
+    }
+}
+
+/* Custom scrollbar for columns */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+}
+
+.overflow-x-auto::-webkit-scrollbar-track {
+    @apply bg-gray-200 dark:bg-gray-700 rounded;
+}
+
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 dark:bg-gray-500 rounded;
+}
+
+/* Drag and drop styles */
+.dragging {
+    @apply opacity-50;
+}
