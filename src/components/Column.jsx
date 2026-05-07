@@ -26,7 +26,7 @@ const Column = ({ columnId, title, tasks, color }) => {
                     <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
-                        className={`p-3 min-h-[500px] max-h-[70vh] overflow-y-auto transition-colors ${snapshot.isDraggingOver ? 'bg-gray-50 dark:bg-gray-800' : ''
+                        className={`flex-1 p-3 overflow-y-auto transition-colors ${snapshot.isDraggingOver ? 'bg-gray-50 dark:bg-gray-800' : ''
                             }`}
                     >
                         {tasks.map((task, index) => (

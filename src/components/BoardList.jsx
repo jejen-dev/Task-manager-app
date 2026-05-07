@@ -1,3 +1,4 @@
+// src/components/BoardList.jsx
 import React, { useState } from 'react';
 import { useBoards } from '../contexts/BoardsContext';
 
@@ -39,7 +40,7 @@ const BoardList = () => {
     };
 
     return (
-        <div className="bg-light-card dark:bg-dark-card rounded-lg shadow-md p-4">
+        <div className="bg-light-card dark:bg-dark-card rounded-lg shadow-md p-4 flex flex-col h-full">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-light-text dark:text-dark-text">Boards</h2>
                 <button
@@ -77,7 +78,8 @@ const BoardList = () => {
                 </div>
             )}
 
-            <div className="space-y-2">
+            {/* Area scroll daftar board */}
+            <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
                 {Object.values(boards).map((board) => (
                     <div
                         key={board.id}

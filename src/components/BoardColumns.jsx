@@ -35,19 +35,17 @@ const BoardColumns = () => {
 
     return (
         <DragDropContext onDragEnd={handleDragEnd}>
-            <div className="overflow-x-auto pb-4">
-                <div className="flex gap-4 min-w-min" style={{ minWidth: 'min-content' }}>
-                    {COLUMNS.map((column) => (
-                        <div key={column.id} className="w-80 flex-shrink-0">
-                            <Column
-                                columnId={column.id}
-                                title={column.title}
-                                tasks={activeBoard.columns[column.id] || []}
-                                color={column.color}
-                            />
-                        </div>
-                    ))}
-                </div>
+            {/* Grid 4 kolom, tanpa overflow horizontal */}
+            <div className="grid grid-cols-4 gap-4 h-full w-full">
+                {COLUMNS.map((column) => (
+                    <Column
+                        key={column.id}
+                        columnId={column.id}
+                        title={column.title}
+                        tasks={activeBoard.columns[column.id] || []}
+                        color={column.color}
+                    />
+                ))}
             </div>
         </DragDropContext>
     );
