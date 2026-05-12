@@ -6,10 +6,10 @@ const TaskCard = ({ task, index }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const tagColors = {
-        'Concept': 'bg-accent-yellow-light text-accent-yellow',
-        'Technical': 'bg-accent-blue-light text-accent-blue',
-        'Design': 'bg-purple-100 text-purple-800',
-        'Front-end': 'bg-accent-green-light text-accent-green'
+        'Concept': 'bg-yellow-500 text-black', // bisa disesuaikan, asal terlihat
+        'Technical': 'bg-blue-500 text-white',
+        'Design': 'bg-purple-500 text-white',
+        'Front-end': 'bg-green-500 text-white'
     };
 
     return (
@@ -21,7 +21,7 @@ const TaskCard = ({ task, index }) => {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         onClick={() => setIsModalOpen(true)}
-                        className={`bg-white dark:bg-gray-800 rounded-lg p-3 mb-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow ${snapshot.isDragging ? 'dragging' : ''
+                        className={`bg-[#191B1F] rounded-lg p-3 mb-3 shadow-sm cursor-pointer hover:shadow-md transition-shadow ${snapshot.isDragging ? 'opacity-50' : ''
                             }`}
                     >
                         {task.coverImage && (
@@ -31,7 +31,7 @@ const TaskCard = ({ task, index }) => {
                                 className="w-full h-32 object-cover rounded-md mb-2"
                             />
                         )}
-                        <h4 className="text-sm font-medium text-light-text dark:text-dark-text mb-2">
+                        <h4 className="text-sm font-medium text-white mb-2">
                             {task.name}
                         </h4>
                         {task.tags && task.tags.length > 0 && (
@@ -39,7 +39,7 @@ const TaskCard = ({ task, index }) => {
                                 {task.tags.map((tag) => (
                                     <span
                                         key={tag}
-                                        className={`text-xs px-2 py-1 rounded-full ${tagColors[tag] || 'bg-gray-100 text-gray-700'}`}
+                                        className={`text-xs px-2 py-1 rounded-full ${tagColors[tag] || 'bg-gray-700 text-white'}`}
                                     >
                                         {tag}
                                     </span>

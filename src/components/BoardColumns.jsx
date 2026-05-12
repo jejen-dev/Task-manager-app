@@ -4,14 +4,14 @@ import { useBoards } from '../contexts/BoardsContext';
 import Column from './Column';
 
 const COLUMNS = [
-    { id: 'Backlog', title: 'Backlog', color: 'accent-red' },
-    { id: 'In Progress', title: 'In Progress', color: 'accent-blue' },
-    { id: 'In Review', title: 'In Review', color: 'accent-yellow' },
-    { id: 'Completed', title: 'Completed', color: 'accent-green' }
+    { id: 'Backlog', title: 'Backlog', color: '#70a3f3' },
+    { id: 'In Progress', title: 'In Progress', color: '#f3ce49' },
+    { id: 'In Review', title: 'In Review', color: '#b787f6' },
+    { id: 'Completed', title: 'Completed', color: '#77db89' }
 ];
 
 const BoardColumns = () => {
-    const { boards, activeBoardId, moveTask } = useBoards();
+    const { boards, activeBoardId, moveTask, addTask } = useBoards();
     const activeBoard = boards[activeBoardId];
 
     if (!activeBoard) {
@@ -19,8 +19,7 @@ const BoardColumns = () => {
     }
 
     const handleDragEnd = (result) => {
-        const { destination, source, draggableId } = result;
-
+        const { destination, source } = result;
         if (!destination) return;
         if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
@@ -35,8 +34,7 @@ const BoardColumns = () => {
 
     return (
         <DragDropContext onDragEnd={handleDragEnd}>
-            {/* Grid 4 kolom, tanpa overflow horizontal */}
-            <div className="grid grid-cols-4 gap-4 h-full w-full">
+            <div className="grid grid-cols-4 gap-0 h-full w-full bg-[#191B1F] p-4 rounded-xl">
                 {COLUMNS.map((column) => (
                     <Column
                         key={column.id}
@@ -44,6 +42,8 @@ const BoardColumns = () => {
                         title={column.title}
                         tasks={activeBoard.columns[column.id] || []}
                         color={column.color}
+                        onAddTask={column.id === 'Backlog' ? addTask : null}
+                        activeBoardId={activeBoardId}
                     />
                 ))}
             </div>

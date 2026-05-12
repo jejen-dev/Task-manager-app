@@ -83,7 +83,6 @@ export const fetchAllBoards = async () => {
             } catch (error) {
                 console.error(`Error fetching board detail for ${boardInfo.id}:`, error);
                 // Jika satu board gagal, kita tetap lanjut ke board lain
-                // Kita juga bisa mengisi board dengan data kosong sebagai fallback
                 boardsData[boardInfo.id] = getEmptyBoard(boardInfo.id, boardInfo.name);
             }
         }
@@ -120,6 +119,7 @@ const getEmptyBoard = (id, name) => {
 
 /**
  * Data fallback jika API tidak dapat dijangkau
+ * Sudah ditambahkan task "Default task" dengan tag "Concept"
  */
 const getFallbackBoards = () => {
     return {
@@ -129,6 +129,13 @@ const getFallbackBoards = () => {
             logoUrl: EMOJI_LOGOS[0],
             columns: {
                 'Backlog': [
+                    {
+                        id: '7',
+                        name: 'Default task',
+                        status: 'Backlog',
+                        tags: ['Concept'],
+                        coverImage: null
+                    },
                     {
                         id: '1',
                         name: 'Design System Implementation',
