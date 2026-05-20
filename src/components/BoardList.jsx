@@ -27,10 +27,7 @@ const BoardList = () => {
                         <span className="text-light-text dark:text-dark-text font-medium">{board.name}</span>
                     </div>
                     {Object.keys(boards).length > 1 && (
-                        <button
-                            onClick={(e) => handleDelete(board.id, e)}
-                            className="text-red-500 hover:text-red-700 opacity-50 hover:opacity-100 transition-opacity"
-                        >
+                        <button onClick={(e) => handleDelete(board.id, e)} className="text-red-500 hover:text-red-700 opacity-50 hover:opacity-100 transition-opacity">
                             <img src="/resources/icons/Close_round.svg" alt="Delete" className="w-4 h-4" />
                         </button>
                     )}
