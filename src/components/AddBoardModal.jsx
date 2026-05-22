@@ -32,16 +32,16 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-light-card dark:bg-dark-card rounded-lg shadow-xl max-w-md w-full">
-                {/* Header */}
-                <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                {/* Header - tanpa border bawah */}
+                <div className="flex justify-between items-center p-4 pb-2">
                     <h2 className="text-xl font-semibold text-light-text dark:text-dark-text">New board</h2>
                     <button onClick={onClose} className="text-light-secondary dark:text-dark-secondary hover:text-gray-700 dark:hover:text-gray-300">
                         <img src="/resources/icons/Close_round.svg" alt="Close" className="w-6 h-6" />
                     </button>
                 </div>
 
-                {/* Body */}
-                <div className="p-4 space-y-4">
+                {/* Body - tanpa border */}
+                <div className="p-4 pt-0 space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-light-text dark:text-dark-text mb-2">Board name</label>
                         <input
@@ -97,8 +97,8 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                     </div>
                 </div>
 
-                {/* Footer: Create board paling kiri, Cancel di kanannya, lalu ruang kosong */}
-                <div className="flex items-center gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
+                {/* Footer - tanpa border atas */}
+                <div className="flex items-center gap-3 p-4 pt-2">
                     <button
                         onClick={handleSubmit}
                         className="px-4 py-2 bg-accent-blue text-white rounded-lg hover:bg-opacity-90 flex items-center gap-2"
