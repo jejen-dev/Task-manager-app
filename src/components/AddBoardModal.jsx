@@ -68,8 +68,8 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                                         src={logo}
                                         alt={`Logo ${idx + 1}`}
                                         className={`w-full h-full object-cover transition-all ${selectedLogo === logo
-                                                ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-light-card dark:ring-offset-dark-card'
-                                                : 'opacity-70 hover:opacity-100'
+                                            ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-light-card dark:ring-offset-dark-card'
+                                            : 'opacity-70 hover:opacity-100'
                                             }`}
                                     />
                                 </button>
@@ -87,8 +87,8 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                                         src={logo}
                                         alt={`Logo ${idx + 9}`}
                                         className={`w-full h-full object-cover transition-all ${selectedLogo === logo
-                                                ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-light-card dark:ring-offset-dark-card'
-                                                : 'opacity-70 hover:opacity-100'
+                                            ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-light-card dark:ring-offset-dark-card'
+                                            : 'opacity-70 hover:opacity-100'
                                             }`}
                                     />
                                 </button>
