@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { useBoards } from '../contexts/BoardsContext';
 import BoardList from './BoardList';
-import AddBoardModal from './AddBoardModal'; // import modal
+import AddBoardModal from './AddBoardModal';
 
 const Sidebar = ({ darkMode, setDarkMode }) => {
     const { boards, activeBoardId, setActiveBoardId, addBoard } = useBoards();
@@ -21,7 +22,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                     </button>
 
                     {!showDetails ? (
-                        // Mode ringkas
+                        // Mode ringkas (tidak berubah)
                         <>
                             <div className="flex flex-col items-center gap-3 overflow-y-auto hide-scrollbar">
                                 {Object.values(boards).map((board) => (
@@ -30,7 +31,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                                     </button>
                                 ))}
                             </div>
-                            {/* Tombol add board: buka modal */}
+
                             <button onClick={() => setShowModal(true)} className="flex justify-center my-4 w-full">
                                 <img src="/resources/icons/Add_round_fill.svg" alt="add board" className="w-6 h-6" />
                             </button>
@@ -43,21 +44,34 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                         </>
                     ) : (
                         // Mode detail
-                        <div className="flex-1 overflow-y-auto hide-scrollbar mb-4 relative">
-                            <BoardList />
-                            <div className="sticky bottom-0 bg-dark-bg dark:bg-dark-bg pt-2">
-                                {/* Tombol add board: buka modal */}
-                                <button onClick={() => setShowModal(true)} className="flex items-center gap-2 text-white bg-[#3A3E44] p-2 rounded-lg mt-4 w-full justify-center">
-                                    <img src="/resources/icons/Add_round_fill.svg" alt="add" className="w-5 h-5" />
-                                    <span>Add new board</span>
+                        <>
+                            {/* Area scroll untuk BoardList dan tombol Add new board */}
+                            <div className="flex-1 overflow-y-auto hide-scrollbar mb-4 relative">
+                                <BoardList />
+                                <div className="sticky bottom-0 bg-dark-bg dark:bg-dark-bg pt-2">
+                                    <button onClick={() => setShowModal(true)} className="flex items-center gap-2 text-white bg-[#3A3E44] p-2 rounded-lg mt-4 w-full justify-center">
+                                        <img src="/resources/icons/Add_round_fill.svg" alt="add" className="w-5 h-5" />
+                                        <span>Add new board</span>
+                                    </button>
+                                </div>
+                            </div>
+                            {/* Toggle mode - di luar area scroll, tidak ikut scroll */}
+                            <div className="bg-[#3A3E44] rounded-lg p-2 flex gap-2">
+                                <button onClick={() => setDarkMode(true)} className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md transition ${darkMode ? 'bg-[#191B1F] text-white' : 'bg-transparent text-gray-400'}`}>
+                                    <img src="/resources/icons/Moon_fill.svg" alt="dark" className="w-4 h-4" />
+                                    <span>Dark</span>
+                                </button>
+                                <button onClick={() => setDarkMode(false)} className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md transition ${!darkMode ? 'bg-[#191B1F] text-white' : 'bg-transparent text-gray-400'}`}>
+                                    <img src="/resources/icons/Sun_fill.svg" alt="light" className="w-4 h-4" />
+                                    <span>Light</span>
                                 </button>
                             </div>
-                        </div>
+                        </>
                     )}
                 </div>
             </div>
 
-            {/* Modal akan muncul jika showModal true */}
+
             {showModal && <AddBoardModal onClose={() => setShowModal(false)} onAddBoard={handleAddBoard} />}
         </>
     );

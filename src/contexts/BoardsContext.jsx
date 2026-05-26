@@ -101,30 +101,42 @@ export const BoardsProvider = ({
         });
     }, [setBoards]);
 
-    // Mengupdate task (edit nama, status, tags, coverImage)
+    // !!! PERUBAHAN: Mengupdate task dan memindahkannya ke kolom yang sesuai jika status berubah
     const updateTask = useCallback((boardId, taskId, updatedFields) => {
         setBoards(prevBoards => {
             const board = prevBoards[boardId];
             if (!board) return prevBoards;
 
+            // Salin kolom
             const columns = { ...board.columns };
-            let taskFound = false;
+            let taskToUpdate = null;
+            let oldStatus = null;
 
-            // Cari task di semua kolom
+            // 1. Cari task di semua kolom dan hapus dari kolom asalnya
             for (const [status, tasks] of Object.entries(columns)) {
                 const taskIndex = tasks.findIndex(t => t.id === taskId);
                 if (taskIndex !== -1) {
-                    const updatedTask = { ...tasks[taskIndex], ...updatedFields };
+                    taskToUpdate = { ...tasks[taskIndex], ...updatedFields };
+                    oldStatus = status;
                     const newTasks = [...tasks];
-                    newTasks[taskIndex] = updatedTask;
+                    newTasks.splice(taskIndex, 1);
                     columns[status] = newTasks;
-                    taskFound = true;
                     break;
                 }
             }
 
-            if (!taskFound) return prevBoards;
+            if (!taskToUpdate) return prevBoards;
 
+            // 2. Tentukan status baru (jika diubah, pakai updatedFields.status, jika tidak pakai status lama)
+            const newStatus = updatedFields.status !== undefined ? updatedFields.status : oldStatus;
+
+            // 3. Masukkan task ke kolom yang sesuai dengan status baru
+            if (!columns[newStatus]) {
+                columns[newStatus] = [];
+            }
+            columns[newStatus] = [...columns[newStatus], taskToUpdate];
+
+            // 4. Kembalikan state baru
             return {
                 ...prevBoards,
                 [boardId]: {
