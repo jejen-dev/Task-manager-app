@@ -1,5 +1,6 @@
 import React from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useBoards } from '../contexts/BoardsContext';
 import Column from './Column';
 
@@ -11,29 +12,15 @@ const COLUMNS = [
 ];
 
 const BoardColumns = () => {
-    const { boards, activeBoardId, moveTask, addTask } = useBoards();
+    const { boards, activeBoardId, moveTask } = useBoards();
     const activeBoard = boards[activeBoardId];
 
     if (!activeBoard) {
         return <div className="text-center py-8">No board selected</div>;
     }
 
-    const handleDragEnd = (result) => {
-        const { destination, source } = result;
-        if (!destination) return;
-        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-
-        moveTask(
-            activeBoardId,
-            source.droppableId,
-            destination.droppableId,
-            source.index,
-            destination.index
-        );
-    };
-
     return (
-        <DragDropContext onDragEnd={handleDragEnd}>
+        <DndProvider backend={HTML5Backend}>
             <div className="grid grid-cols-4 gap-0 h-full w-full bg-white dark:bg-[#191B1F] p-4 rounded-xl">
                 {COLUMNS.map((column) => (
                     <Column
@@ -42,12 +29,11 @@ const BoardColumns = () => {
                         title={column.title}
                         tasks={activeBoard.columns[column.id] || []}
                         color={column.color}
-                        onAddTask={column.id === 'Backlog' ? addTask : null}
                         activeBoardId={activeBoardId}
                     />
                 ))}
             </div>
-        </DragDropContext>
+        </DndProvider>
     );
 };
 

@@ -79,12 +79,18 @@ const TaskEditModal = ({ task, onClose }) => {
     };
 
     const handleSave = () => {
-        if (!taskName.trim()) {
+        const trimmed = taskName.trim();
+        if (trimmed === '') {
             alert('Task name is required');
             return;
         }
+
+        if (trimmed.length > 100) {
+            alert('Task name cannot exceed 100 characters');
+            return;
+        }
         updateTask(activeBoardId, task.id, {
-            name: taskName,
+            name: trimmed,
             status,
             tags: selectedTags,
             coverImage
@@ -133,7 +139,7 @@ const TaskEditModal = ({ task, onClose }) => {
                             type="text"
                             value={taskName}
                             onChange={(e) => setTaskName(e.target.value)}
-                            placeholder="Enter task name"
+                            placeholder="Enter task name (max 100 chars)"
                             className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text"
                         />
                     </div>

@@ -21,13 +21,36 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
     const [selectedLogo, setSelectedLogo] = useState(emojiLogos[0]);
 
     const handleSubmit = () => {
-        if (boardName.trim() === '') {
+        const trimmedName = boardName.trim();
+        if (trimmedName === '') {
             alert('Board name cannot be empty');
             return;
         }
-        onAddBoard(boardName.trim(), selectedLogo);
+
+        if (trimmedName.length > 25) {
+            alert('Board name cannot exceed 25 characters');
+            return;
+        }
+        onAddBoard(trimmedName, selectedLogo);
         onClose();
     };
+
+    const handleOnChangeName = (e) => {
+        console.dir(e);
+
+        setBoardName(e.target.value);
+
+    }
+
+    const handleEnterName = (event) => {
+        if (event.key === 'Enter') {
+            // Tulis kode atau fungsi yang ingin dijalankan di sini
+            console.log('Tombol Enter ditekan di React!');
+            event.preventDefault(); // Mencegah submit otomatis jika di dalam form
+
+            handleSubmit();
+        }
+    }
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -48,7 +71,8 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                         <input
                             type="text"
                             value={boardName}
-                            onChange={(e) => setBoardName(e.target.value)}
+                            onChange={handleOnChangeName}
+                            onKeyDown={handleEnterName}
                             placeholder="Enter board name"
                             className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text"
                             autoFocus

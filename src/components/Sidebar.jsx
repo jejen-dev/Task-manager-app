@@ -16,7 +16,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
         <>
             <div className={`${showDetails ? 'w-72' : 'w-auto'} bg-white dark:bg-dark-bg rounded-xl flex flex-col p-4 h-full`}>
                 <div className="flex flex-col h-full">
-                    <button onClick={() => setShowDetails(!showDetails)} className="text-black dark:text-white mb-6 self-start w-10 h-10 rounded-full bg-[#EEF4FC] dark:bg-[#3A3E44] flex items-center justify-center">
+                    <button onClick={() => setShowDetails(!showDetails)} className="text-black dark:text-white mb-6 self-start w-10 h-10 rounded-full bg-[#EEF4FC] dark:bg-[#3A3E44] flex items-center justify-center flex-shrink-0">
                         <img src={showDetails ? "/resources/icons/Close_round.svg" : "/resources/icons/Menu.svg"} alt="menu" className="w-5 h-5 filter dark:invert-0 invert" />
                     </button>
 
@@ -32,7 +32,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                             </div>
 
                             <button onClick={() => setShowModal(true)} className="flex justify-center my-4 w-full">
-                                <img src="/resources/icons/Add_round_fill.svg" alt="add board" className="w-6 h-6 filter dark:invert-0 invert" />
+                                <img src="/resources/icons/Add_round_fill.svg" alt="add board" className="w-6 h-6 filter dark:invert-0 invert flex-shrink-0" />
                             </button>
 
                             <div className="flex-1"></div>

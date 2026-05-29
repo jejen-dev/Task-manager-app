@@ -1,20 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { useDrop } from 'react-dnd';
+import { useBoards } from '../contexts/BoardsContext';
 import TaskCard from './TaskCard';
 
-const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => {
+const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
+    const { addTask, moveTask } = useBoards();
     const [isAdding, setIsAdding] = useState(false);
     const [newTaskName, setNewTaskName] = useState('');
     const taskContainerRef = useRef(null);
     const [isOverflow, setIsOverflow] = useState(false);
 
-    const handleAddTask = () => {
-        if (newTaskName.trim() && onAddTask) {
-            onAddTask(activeBoardId, newTaskName);
-            setNewTaskName('');
-            setIsAdding(false);
-        }
-    };
+    // Drop target untuk menerima task dari kolom lain (antar kolom)
+    const [, dropRef] = useDrop({
+        accept: 'TASK',
+        drop: (item, monitor) => {
+            const sourceCol = item.sourceColumnId;
+            const destCol = columnId;
+            const sourceIndex = item.sourceIndex;
+            // Pindahkan hanya jika kolom berbeda (reordering dalam kolom sama sudah ditangani TaskCard)
+            if (sourceCol !== destCol) {
+                moveTask(activeBoardId, sourceCol, destCol, sourceIndex, tasks.length);
+            }
+            return { moved: true };
+        },
+    });
 
     const checkOverflow = () => {
         if (taskContainerRef.current) {
@@ -35,6 +44,21 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
         };
     }, [tasks]);
 
+    const handleAddTask = () => {
+        const trimmed = newTaskName.trim();
+        if (trimmed === '') {
+            alert('Task name cannot be empty');
+            return;
+        }
+        if (trimmed.length > 100) {
+            alert('Task name cannot exceed 100 characters');
+            return;
+        }
+        addTask(activeBoardId, trimmed);
+        setNewTaskName('');
+        setIsAdding(false);
+    };
+
     let borderRadiusClass = '';
     if (columnId === 'Backlog') {
         borderRadiusClass = 'rounded-l-lg rounded-r-none';
@@ -45,8 +69,10 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
     }
 
     return (
-
-        <div className={`bg-[#EEF4FC] dark:bg-[#3A3E44] flex flex-col overflow-hidden h-full ${borderRadiusClass}`}>
+        <div
+            ref={dropRef}
+            className={`bg-[#EEF4FC] dark:bg-[#3A3E44] flex flex-col overflow-hidden h-full ${borderRadiusClass}`}
+        >
             <div className="p-4">
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
@@ -60,26 +86,17 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
                 className={`${isOverflow ? 'flex-1' : ''} overflow-y-auto p-3 hide-scrollbar`}
                 style={{ minHeight: 0 }}
             >
-                <Droppable droppableId={columnId}>
-                    {(provided, snapshot) => (
-                        <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className={`transition-colors ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
-                        >
-                            {tasks.length === 0 ? (
-                                <div className="text-left text-[#7E878D] bg-transparent">No tasks</div>
-                            ) : (
-                                tasks.map((task, index) => <TaskCard key={task.id} task={task} index={index} />)
-                            )}
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
+                {tasks.length === 0 ? (
+                    <div className="text-left text-[#7E878D] bg-transparent">No tasks</div>
+                ) : (
+                    tasks.map((task, index) => (
+                        <TaskCard key={task.id} task={task} index={index} columnId={columnId} />
+                    ))
+                )}
             </div>
 
             <div className={`${isOverflow ? 'sticky bottom-0 bg-[#EEF4FC] dark:bg-[#3A3E44]' : ''}`} style={{ padding: '0.75rem', paddingTop: 0 }}>
-                {onAddTask && !isAdding && (
+                {columnId === 'Backlog' && !isAdding && (
                     <button
                         onClick={() => setIsAdding(true)}
                         className="w-full flex items-center justify-between px-4 py-2 rounded-lg"
@@ -89,13 +106,19 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
                         <img src="/resources/icons/Add_round.svg" alt="add" className="w-5 h-5" />
                     </button>
                 )}
-                {isAdding && onAddTask && (
+                {isAdding && columnId === 'Backlog' && (
                     <div className="bg-white dark:bg-[#191B1F] rounded-lg p-3">
                         <input
                             type="text"
                             value={newTaskName}
                             onChange={(e) => setNewTaskName(e.target.value)}
-                            placeholder="Task name"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddTask();
+                                }
+                            }}
+                            placeholder="Task name (max 100 chars)"
                             className="w-full bg-transparent text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1 mb-2"
                             autoFocus
                         />

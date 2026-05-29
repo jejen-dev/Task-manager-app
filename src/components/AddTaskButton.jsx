@@ -7,11 +7,19 @@ const AddTaskButton = () => {
     const [taskName, setTaskName] = useState('');
 
     const handleAddTask = () => {
-        if (taskName.trim()) {
-            addTask(activeBoardId, taskName);
-            setTaskName('');
-            setIsAdding(false);
+        const trimmed = taskName.trim();
+        if (trimmed === '') {
+            alert('Task name cannot be empty');
+            return;
         }
+
+        if (trimmed.length > 100) {
+            alert('Task name cannot exceed 100 characters');
+            return;
+        }
+        addTask(activeBoardId, trimmed);
+        setTaskName('');
+        setIsAdding(false);
     };
 
     if (!isAdding) {
@@ -32,7 +40,13 @@ const AddTaskButton = () => {
                 type="text"
                 value={taskName}
                 onChange={(e) => setTaskName(e.target.value)}
-                placeholder="Task name"
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddTask();
+                    }
+                }}
+                placeholder="Task name (max 100 chars)"
                 className="w-full px-3 py-2 mb-3 border rounded-lg dark:bg-dark-card dark:border-gray-600 dark:text-dark-text"
                 autoFocus
             />
