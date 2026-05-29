@@ -12,7 +12,7 @@ export default {
                 'dark-card': '#2A2D32',
                 'dark-text': '#FEF7EE',
                 'dark-secondary': '#7E878D',
-                'light-bg': '#FEF7EE',
+                'light-bg': '#FFFFFF',
                 'light-card': '#FFFFFF',
                 'light-text': '#191B1F',
                 'light-secondary': '#7E878D',

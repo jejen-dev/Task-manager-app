@@ -42,7 +42,7 @@ const App = () => {
 
     return (
         <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-            <div className="flex h-screen p-3 gap-3 bg-light-bg dark:bg-dark-bg">
+            <div className="flex h-screen p-3 gap-0 bg-white dark:bg-dark-bg">
                 <BoardsProvider
                     boards={boardsData}
                     setBoards={setBoardsData}

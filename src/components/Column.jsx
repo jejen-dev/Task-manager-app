@@ -16,7 +16,6 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
         }
     };
 
-    // Cek apakah task container overflow (butuh scroll)
     const checkOverflow = () => {
         if (taskContainerRef.current) {
             const container = taskContainerRef.current;
@@ -42,21 +41,20 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
     } else if (columnId === 'Completed') {
         borderRadiusClass = 'rounded-r-lg rounded-l-none';
     } else {
-        borderRadiusClass = 'rounded-none';
+        borderRadiusClass = '';
     }
 
     return (
-        <div className={`bg-[#3A3E44] flex flex-col overflow-hidden h-full ${borderRadiusClass}`}>
-            {/* Header */}
+
+        <div className={`bg-[#EEF4FC] dark:bg-[#3A3E44] flex flex-col overflow-hidden h-full ${borderRadiusClass}`}>
             <div className="p-4">
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
-                    <h3 className="font-semibold text-white">{title}</h3>
-                    <span className="text-sm text-white">({tasks.length})</span>
+                    <h3 className="font-semibold text-black dark:text-white">{title}</h3>
+                    <span className="text-sm text-black dark:text-white">({tasks.length})</span>
                 </div>
             </div>
 
-            {/* Task container – hanya pakai flex-1 jika overflow */}
             <div
                 ref={taskContainerRef}
                 className={`${isOverflow ? 'flex-1' : ''} overflow-y-auto p-3 hide-scrollbar`}
@@ -67,7 +65,7 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
                         <div
                             ref={provided.innerRef}
                             {...provided.droppableProps}
-                            className={`transition-colors ${snapshot.isDraggingOver ? 'bg-gray-700' : ''}`}
+                            className={`transition-colors ${snapshot.isDraggingOver ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
                         >
                             {tasks.length === 0 ? (
                                 <div className="text-left text-[#7E878D] bg-transparent">No tasks</div>
@@ -80,8 +78,7 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
                 </Droppable>
             </div>
 
-            {/* Tombol – jika overflow, jadi sticky bottom, jika tidak, tetap flow */}
-            <div className={`${isOverflow ? 'sticky bottom-0 bg-[#3A3E44]' : ''}`} style={{ padding: '0.75rem', paddingTop: 0 }}>
+            <div className={`${isOverflow ? 'sticky bottom-0 bg-[#EEF4FC] dark:bg-[#3A3E44]' : ''}`} style={{ padding: '0.75rem', paddingTop: 0 }}>
                 {onAddTask && !isAdding && (
                     <button
                         onClick={() => setIsAdding(true)}
@@ -93,13 +90,13 @@ const Column = ({ columnId, title, tasks, color, onAddTask, activeBoardId }) => 
                     </button>
                 )}
                 {isAdding && onAddTask && (
-                    <div className="bg-[#191B1F] rounded-lg p-3">
+                    <div className="bg-white dark:bg-[#191B1F] rounded-lg p-3">
                         <input
                             type="text"
                             value={newTaskName}
                             onChange={(e) => setNewTaskName(e.target.value)}
                             placeholder="Task name"
-                            className="w-full bg-transparent text-white border border-gray-600 rounded px-2 py-1 mb-2"
+                            className="w-full bg-transparent text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1 mb-2"
                             autoFocus
                         />
                         <div className="flex gap-2">

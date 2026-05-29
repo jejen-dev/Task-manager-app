@@ -34,7 +34,7 @@ const BoardColumns = () => {
 
     return (
         <DragDropContext onDragEnd={handleDragEnd}>
-            <div className="grid grid-cols-4 gap-0 h-full w-full bg-[#191B1F] p-4 rounded-xl">
+            <div className="grid grid-cols-4 gap-0 h-full w-full bg-white dark:bg-[#191B1F] p-4 rounded-xl">
                 {COLUMNS.map((column) => (
                     <Column
                         key={column.id}
