@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+// Daftar path logo board yang tersedia (13 pilihan)
 const emojiLogos = [
     '/resources/emojis/board-logo-01.png',
     '/resources/emojis/board-logo-02.png',
@@ -16,10 +17,14 @@ const emojiLogos = [
     '/resources/emojis/board-logo-13.png'
 ];
 
+// Komponen modal untuk menambah board baru
 const AddBoardModal = ({ onClose, onAddBoard }) => {
+    // State nama board
     const [boardName, setBoardName] = useState('');
+    // State logo yang dipilih (default logo pertama)
     const [selectedLogo, setSelectedLogo] = useState(emojiLogos[0]);
 
+    // Fungsi submit: validasi dan panggil onAddBoard dari parent
     const handleSubmit = () => {
         const trimmedName = boardName.trim();
         if (trimmedName === '') {
@@ -31,23 +36,22 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
             alert('Board name cannot exceed 25 characters');
             return;
         }
+        // Panggil fungsi addBoard yang diberikan dari props
         onAddBoard(trimmedName, selectedLogo);
-        onClose();
+        onClose(); // Tutup modal setelah berhasil
     };
 
+    // Handler perubahan input nama board
     const handleOnChangeName = (e) => {
-        console.dir(e);
-
+        console.dir(e); // Log event untuk debugging (boleh dihapus)
         setBoardName(e.target.value);
-
     }
 
+    // Handler tombol Enter pada input
     const handleEnterName = (event) => {
         if (event.key === 'Enter') {
-            // Tulis kode atau fungsi yang ingin dijalankan di sini
             console.log('Tombol Enter ditekan di React!');
-            event.preventDefault(); // Mencegah submit otomatis jika di dalam form
-
+            event.preventDefault(); // Mencegah submit default form
             handleSubmit();
         }
     }
@@ -55,7 +59,7 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-dark-card rounded-lg shadow-xl max-w-md w-full">
-                {/* Header */}
+                {/* Header modal: judul dan tombol close */}
                 <div className="flex justify-between items-center p-4 pb-2">
                     <h2 className="text-xl font-semibold text-black dark:text-dark-text">New board</h2>
                     <button onClick={onClose} className="text-black dark:text-dark-secondary hover:text-gray-700 dark:hover:text-gray-300">
@@ -63,10 +67,9 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                     </button>
                 </div>
 
-                {/* Body */}
+                {/* Body modal: form input nama dan pilihan logo */}
                 <div className="p-4 pt-0 space-y-4">
                     <div>
-
                         <label className="block text-sm font-medium text-black dark:text-dark-text mb-2">Board name</label>
                         <input
                             type="text"
@@ -75,7 +78,7 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                             onKeyDown={handleEnterName}
                             placeholder="Enter board name"
                             className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text"
-                            autoFocus
+                            autoFocus // Fokus otomatis saat modal terbuka
                         />
                     </div>
 
@@ -93,7 +96,6 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                                         src={logo}
                                         alt={`Logo ${idx + 1}`}
                                         className={`w-full h-full object-cover transition-all ${selectedLogo === logo
-
                                             ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-dark-card'
                                             : 'opacity-40 hover:opacity-100'
                                             }`}
@@ -123,7 +125,7 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                     </div>
                 </div>
 
-                {/* Footer */}
+                {/* Footer modal: tombol Create board dan Cancel */}
                 <div className="flex items-center gap-3 p-4 pt-2">
                     <button
                         onClick={handleSubmit}

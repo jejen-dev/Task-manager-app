@@ -3,25 +3,29 @@ import { useBoards } from '../contexts/BoardsContext';
 import BoardList from './BoardList';
 import AddBoardModal from './AddBoardModal';
 
+// Komponen Sidebar (menu kiri aplikasi)
 const Sidebar = ({ darkMode, setDarkMode }) => {
     const { boards, activeBoardId, setActiveBoardId, addBoard } = useBoards();
-    const [showDetails, setShowDetails] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+    const [showDetails, setShowDetails] = useState(false); // Mode ringkas (false) atau detail (true)
+    const [showModal, setShowModal] = useState(false); // Menampilkan modal AddBoardModal
 
+    // Fungsi untuk menambah board (dipanggil dari modal)
     const handleAddBoard = (boardName, logoUrl) => {
         addBoard(boardName, logoUrl);
     };
 
     return (
         <>
+            {/* Sidebar container: lebar responsif, mode detail: w-72 (normal) mengecil jadi w-56 di bawah 450px */}
             <div className={`${showDetails ? 'w-72 max-[450px]:w-56' : 'w-auto'} bg-white dark:bg-dark-bg rounded-xl flex flex-col p-4 h-full`}>
                 <div className="flex flex-col h-full">
+                    {/* Tombol toggle mode ringkas/detail */}
                     <button onClick={() => setShowDetails(!showDetails)} className="text-black dark:text-white mb-6 self-start w-10 h-10 rounded-full bg-[#EEF4FC] dark:bg-[#3A3E44] flex items-center justify-center flex-shrink-0">
                         <img src={showDetails ? "/resources/icons/Close_round.svg" : "/resources/icons/Menu.svg"} alt="menu" className="w-5 h-5 filter dark:invert-0 invert" />
                     </button>
 
                     {!showDetails ? (
-                        // Mode ringkas
+                        // Mode ringkas: hanya icon board, tombol tambah board, dan dark mode toggle
                         <>
                             <div className="flex flex-col items-center gap-3 overflow-y-auto hide-scrollbar">
                                 {Object.values(boards).map((board) => (
@@ -45,7 +49,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                             </div>
                         </>
                     ) : (
-                        // Mode detail
+                        // Mode detail: daftar board dengan nama lengkap, tombol tambah board, dan toggle dark/light mode
                         <>
                             <div className="flex-1 overflow-y-auto hide-scrollbar mb-4 relative">
                                 <BoardList />
@@ -70,6 +74,8 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                     )}
                 </div>
             </div>
+
+            {/* Modal tambah board */}
             {showModal && <AddBoardModal onClose={() => setShowModal(false)} onAddBoard={handleAddBoard} />}
         </>
     );

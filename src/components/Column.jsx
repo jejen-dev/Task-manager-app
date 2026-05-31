@@ -3,16 +3,19 @@ import { useDrop } from 'react-dnd';
 import { useBoards } from '../contexts/BoardsContext';
 import TaskCard from './TaskCard';
 
+// Komponen kolom (satu kolom dari kanban board)
 const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
     const { addTask, moveTask } = useBoards();
-    const [isAdding, setIsAdding] = useState(false);
+    const [isAdding, setIsAdding] = useState(false); // Mode input task baru
     const [newTaskName, setNewTaskName] = useState('');
-    const taskContainerRef = useRef(null);
-    const [isOverflow, setIsOverflow] = useState(false);
+    const taskContainerRef = useRef(null); // Referensi container daftar task
+    const [isOverflow, setIsOverflow] = useState(false); // Apakah task overflow (scroll vertikal)
 
+    // Drop target untuk menerima task dari kolom lain (antar kolom)
     const [, dropRef] = useDrop({
         accept: 'TASK',
         canDrop: (item) => {
+            // Hanya izinkan drop jika kolom sumber berbeda (mencegah drop di kolom sendiri)
             return item.sourceColumnId !== columnId;
         },
         drop: (item) => {
@@ -20,12 +23,14 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
             const destCol = columnId;
             const sourceIndex = item.sourceIndex;
             if (sourceCol !== destCol) {
+                // Pindahkan task ke kolom ini, letakkan di indeks terakhir (tasks.length)
                 moveTask(activeBoardId, sourceCol, destCol, sourceIndex, tasks.length);
             }
             return { moved: true };
         },
     });
 
+    // Fungsi untuk mengecek apakah container task overflow (scroll vertikal)
     const checkOverflow = () => {
         if (taskContainerRef.current) {
             const container = taskContainerRef.current;
@@ -34,6 +39,7 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         }
     };
 
+    // Efek untuk memantau overflow saat tasks berubah atau resize
     useEffect(() => {
         checkOverflow();
         window.addEventListener('resize', checkOverflow);
@@ -45,6 +51,7 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         };
     }, [tasks]);
 
+    // Tambah task baru ke kolom Backlog (hanya untuk kolom Backlog)
     const handleAddTask = () => {
         const trimmed = newTaskName.trim();
         if (trimmed === '') {
@@ -60,6 +67,7 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         setIsAdding(false);
     };
 
+    // Tentukan border radius khusus untuk kolom pertama dan terakhir
     let borderRadiusClass = '';
     if (columnId === 'Backlog') {
         borderRadiusClass = 'rounded-l-lg rounded-r-none';
@@ -77,8 +85,9 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
                 w-[320px] 
                 lg:w-auto lg:flex-1
             `}
-            style={{ position: 'relative' }} // agar drop target berfungsi
+            style={{ position: 'relative' }} // penting untuk drop target di dalam overflow container
         >
+            {/* Header kolom: warna, judul, jumlah task */}
             <div className="p-4">
                 <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
@@ -87,6 +96,7 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
                 </div>
             </div>
 
+            {/* Daftar task (scroll vertikal jika overflow) */}
             <div
                 ref={taskContainerRef}
                 className={`${isOverflow ? 'flex-1' : ''} overflow-y-auto p-3 hide-scrollbar`}
@@ -101,6 +111,7 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
                 )}
             </div>
 
+            {/* Bagian add task (hanya untuk kolom Backlog) */}
             <div className={`${isOverflow ? 'sticky bottom-0 bg-[#EEF4FC] dark:bg-[#3A3E44]' : ''}`} style={{ padding: '0.75rem', paddingTop: 0 }}>
                 {columnId === 'Backlog' && !isAdding && (
                     <button

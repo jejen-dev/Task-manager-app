@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useBoards } from '../contexts/BoardsContext';
 
+// Daftar tag dan status yang tersedia
 const TAGS = ['Concept', 'Technical', 'Design', 'Front-end'];
 const STATUSES = ['Backlog', 'In Progress', 'In Review', 'Completed'];
 
+// Warna untuk setiap status (lingkaran kecil)
 const statusColors = {
     'Backlog': '#70a3f3',
     'In Progress': '#f3ce49',
@@ -11,6 +13,7 @@ const statusColors = {
     'Completed': '#77db89'
 };
 
+// Warna latar dan teks untuk setiap tag
 const tagColors = {
     'Concept': { bg: '#F9E4E3', text: '#B64B44' },
     'Technical': { bg: '#DEE9FC', text: '#5076E7' },
@@ -18,17 +21,20 @@ const tagColors = {
     'Front-end': { bg: '#E2FBE9', text: '#64AF6C' }
 };
 
+// Modal untuk mengedit detail task
 const TaskEditModal = ({ task, onClose }) => {
     const { activeBoardId, updateTask } = useBoards();
+    // State untuk nilai form
     const [taskName, setTaskName] = useState(task.name);
     const [status, setStatus] = useState(task.status);
     const [selectedTags, setSelectedTags] = useState(task.tags || []);
     const [coverImage, setCoverImage] = useState(task.coverImage || null);
     const [loadingImage, setLoadingImage] = useState(false);
-    const [isStatusOpen, setIsStatusOpen] = useState(false);
-    const [isTagsOpen, setIsTagsOpen] = useState(false);
-    const tagsDropdownRef = useRef(null);
+    const [isStatusOpen, setIsStatusOpen] = useState(false); // Dropdown status terbuka?
+    const [isTagsOpen, setIsTagsOpen] = useState(false); // Dropdown tags terbuka?
+    const tagsDropdownRef = useRef(null); // Referensi dropdown tags untuk deteksi klik di luar
 
+    // Toggle tag: tambah/hapus, batasi maksimal 4 tag
     const toggleTag = (tag) => {
         if (selectedTags.includes(tag)) {
             setSelectedTags(selectedTags.filter(t => t !== tag));
@@ -39,6 +45,7 @@ const TaskEditModal = ({ task, onClose }) => {
         }
     };
 
+    // Tutup dropdown tags jika klik di luar
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (tagsDropdownRef.current && !tagsDropdownRef.current.contains(event.target)) {
@@ -49,6 +56,7 @@ const TaskEditModal = ({ task, onClose }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Menambahkan cover image random dari picsum
     const addRandomCoverImage = async () => {
         setLoadingImage(true);
         try {
@@ -63,6 +71,7 @@ const TaskEditModal = ({ task, onClose }) => {
         }
     };
 
+    // Upload cover image dari file lokal
     const handleUploadCover = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -74,10 +83,12 @@ const TaskEditModal = ({ task, onClose }) => {
         }
     };
 
+    // Hapus cover image
     const removeCoverImage = () => {
         setCoverImage(null);
     };
 
+    // Simpan perubahan task
     const handleSave = () => {
         const trimmed = taskName.trim();
         if (trimmed === '') {
@@ -95,12 +106,13 @@ const TaskEditModal = ({ task, onClose }) => {
             tags: selectedTags,
             coverImage
         });
-        onClose();
+        onClose(); // Tutup modal setelah save
     };
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-dark-card rounded-lg shadow-xl max-w-md w-full">
+                {/* Header modal */}
                 <div className="flex justify-between items-center px-6 py-4 pb-2">
                     <h2 className="text-xl font-semibold text-black dark:text-dark-text">Task details</h2>
                     <button onClick={onClose} className="text-black dark:text-dark-secondary hover:text-gray-700 dark:hover:text-gray-300">
@@ -109,7 +121,7 @@ const TaskEditModal = ({ task, onClose }) => {
                 </div>
 
                 <div className="px-6 pt-1 pb-4 space-y-4">
-                    {/* Cover Image Section */}
+                    {/* Bagian Cover Image */}
                     <div>
                         {coverImage ? (
                             <div className="mb-3">
@@ -144,7 +156,7 @@ const TaskEditModal = ({ task, onClose }) => {
                         />
                     </div>
 
-                    {/* Status */}
+                    {/* Status Dropdown */}
                     <div>
                         <label className="block text-sm font-medium text-black dark:text-dark-text mb-2">Status</label>
                         <div className="relative">
@@ -175,7 +187,7 @@ const TaskEditModal = ({ task, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Tags */}
+                    {/* Tags Dropdown (multi-select) */}
                     <div>
                         <label className="block text-sm font-medium text-black dark:text-dark-text mb-2">Tags</label>
                         <div className="relative" ref={tagsDropdownRef}>
@@ -213,6 +225,7 @@ const TaskEditModal = ({ task, onClose }) => {
                     </div>
                 </div>
 
+                {/* Footer modal: tombol Save dan Cancel */}
                 <div className="flex items-center gap-3 px-6 py-4 pt-2">
                     <button onClick={handleSave} className="px-4 py-2 text-white rounded-lg hover:bg-opacity-90 flex items-center gap-2" style={{ backgroundColor: '#3762e4' }}>
                         <span>Save</span>

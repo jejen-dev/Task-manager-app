@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useBoards } from '../contexts/BoardsContext';
 
+// Komponen tombol untuk menambah task baru (berada di bawah sidebar)
 const AddTaskButton = () => {
-    const { addTask, activeBoardId } = useBoards();
-    const [isAdding, setIsAdding] = useState(false);
-    const [taskName, setTaskName] = useState('');
+    const { addTask, activeBoardId } = useBoards(); // Ambil fungsi addTask dan ID board aktif dari context
+    const [isAdding, setIsAdding] = useState(false); // Mode input (true = tampilkan form)
+    const [taskName, setTaskName] = useState(''); // Nama task yang diinput
 
+    // Fungsi untuk menambah task setelah validasi
     const handleAddTask = () => {
         const trimmed = taskName.trim();
         if (trimmed === '') {
@@ -17,11 +19,12 @@ const AddTaskButton = () => {
             alert('Task name cannot exceed 100 characters');
             return;
         }
-        addTask(activeBoardId, trimmed);
+        addTask(activeBoardId, trimmed); // Panggil addTask dari context (menambah ke kolom Backlog)
         setTaskName('');
-        setIsAdding(false);
+        setIsAdding(false); // Kembali ke mode tombol
     };
 
+    // Mode tombol (default)
     if (!isAdding) {
         return (
             <button
@@ -34,6 +37,7 @@ const AddTaskButton = () => {
         );
     }
 
+    // Mode input form
     return (
         <div className="bg-light-card dark:bg-dark-card rounded-lg p-4 shadow-md">
             <input

@@ -1,9 +1,11 @@
 import React from 'react';
 import { useBoards } from '../contexts/BoardsContext';
 
+// Komponen daftar board (digunakan di Sidebar mode detail)
 const BoardList = () => {
     const { boards, activeBoardId, setActiveBoardId, deleteBoard } = useBoards();
 
+    // Hapus board dengan konfirmasi, stopPropagation agar tidak memicu klik board
     const handleDelete = (boardId, e) => {
         e.stopPropagation();
         if (window.confirm('Are you sure you want to delete this board?')) {
@@ -11,6 +13,7 @@ const BoardList = () => {
         }
     };
 
+    // Memotong nama board jika lebih dari 25 karakter
     const truncateBoardName = (name) => {
         if (name.length > 25) {
             return name.substring(0, 25) + '...';
@@ -35,6 +38,7 @@ const BoardList = () => {
                             {truncateBoardName(board.name)}
                         </span>
                     </div>
+                    {/* Tombol hapus hanya muncul jika jumlah board > 1 (tidak boleh hapus board terakhir) */}
                     {Object.keys(boards).length > 1 && (
                         <button onClick={(e) => handleDelete(board.id, e)} className="text-red-500 hover:text-red-700 opacity-50 hover:opacity-100 transition-opacity flex-shrink-0">
                             <img src="/resources/icons/Close_round.svg" alt="Delete" className="w-4 h-4 filter dark:invert-0 invert" />
