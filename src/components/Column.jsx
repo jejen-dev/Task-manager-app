@@ -10,14 +10,15 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
     const taskContainerRef = useRef(null);
     const [isOverflow, setIsOverflow] = useState(false);
 
-    // Drop target untuk menerima task dari kolom lain (antar kolom)
     const [, dropRef] = useDrop({
         accept: 'TASK',
-        drop: (item, monitor) => {
+        canDrop: (item) => {
+            return item.sourceColumnId !== columnId;
+        },
+        drop: (item) => {
             const sourceCol = item.sourceColumnId;
             const destCol = columnId;
             const sourceIndex = item.sourceIndex;
-            // Pindahkan hanya jika kolom berbeda (reordering dalam kolom sama sudah ditangani TaskCard)
             if (sourceCol !== destCol) {
                 moveTask(activeBoardId, sourceCol, destCol, sourceIndex, tasks.length);
             }
@@ -64,14 +65,19 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         borderRadiusClass = 'rounded-l-lg rounded-r-none';
     } else if (columnId === 'Completed') {
         borderRadiusClass = 'rounded-r-lg rounded-l-none';
-    } else {
-        borderRadiusClass = '';
     }
 
     return (
         <div
             ref={dropRef}
-            className={`bg-[#EEF4FC] dark:bg-[#3A3E44] flex flex-col overflow-hidden h-full ${borderRadiusClass}`}
+            className={`
+                bg-[#EEF4FC] dark:bg-[#3A3E44] 
+                flex flex-col overflow-hidden h-full 
+                ${borderRadiusClass}
+                w-[320px] 
+                lg:w-auto lg:flex-1
+            `}
+            style={{ position: 'relative' }} // agar drop target berfungsi
         >
             <div className="p-4">
                 <div className="flex items-center gap-2">

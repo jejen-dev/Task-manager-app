@@ -8,7 +8,6 @@ const TaskCard = ({ task, index, columnId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const ref = useRef(null);
 
-    // Drag source
     const [{ isDragging }, dragRef] = useDrag({
         type: 'TASK',
         item: () => ({
@@ -21,7 +20,6 @@ const TaskCard = ({ task, index, columnId }) => {
         }),
     });
 
-    // Drop target untuk reordering dalam satu kolom
     const [{ isOver }, dropRef] = useDrop({
         accept: 'TASK',
         hover: (item, monitor) => {
@@ -32,14 +30,14 @@ const TaskCard = ({ task, index, columnId }) => {
             const dragColumn = item.sourceColumnId;
             const hoverColumn = columnId;
 
-            // Hanya proses jika masih dalam kolom yang sama
+            // Hanya proses jika dalam kolom yang sama
             if (dragColumn !== hoverColumn) return;
-
             if (dragIndex === hoverIndex) return;
 
             const hoverBoundingRect = ref.current.getBoundingClientRect();
             const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
             const clientOffset = monitor.getClientOffset();
+            if (!clientOffset) return;
             const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
             let newIndex = hoverIndex;
@@ -55,10 +53,9 @@ const TaskCard = ({ task, index, columnId }) => {
                 newIndex = hoverIndex + 1;
             } else if (dragIndex > hoverIndex && hoverClientY < hoverMiddleY) {
                 newIndex = hoverIndex;
-            } else {
-                newIndex = hoverIndex;
             }
 
+            // Panggil moveTask dengan kolom yang sama
             moveTask(activeBoardId, dragColumn, hoverColumn, dragIndex, newIndex);
             item.sourceIndex = newIndex;
         },
@@ -77,16 +74,12 @@ const TaskCard = ({ task, index, columnId }) => {
     };
 
     const truncateTaskName = (name) => {
-        if (name.length > 100) {
-            return name.substring(0, 100) + '...';
-        }
+        if (name.length > 100) return name.substring(0, 100) + '...';
         return name;
     };
 
     const handleClick = (e) => {
-        if (!isDragging) {
-            setIsModalOpen(true);
-        }
+        if (!isDragging) setIsModalOpen(true);
     };
 
     return (
@@ -98,28 +91,16 @@ const TaskCard = ({ task, index, columnId }) => {
                     ${isDragging ? 'opacity-50 cursor-grabbing' : ''} 
                     ${isOver ? 'border-2 border-blue-400' : ''}`}
             >
-                {task.coverImage && (
-                    <img src={task.coverImage} alt="Task cover" className="w-full h-32 object-cover rounded-md mb-2" />
-                )}
-
-                <h4 className="text-sm font-medium text-black dark:text-white mb-2 break-words">
-                    {truncateTaskName(task.name)}
-                </h4>
+                {task.coverImage && <img src={task.coverImage} alt="Task cover" className="w-full h-32 object-cover rounded-md mb-2" />}
+                <h4 className="text-sm font-medium text-black dark:text-white mb-2 break-words">{truncateTaskName(task.name)}</h4>
                 {task.tags && task.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
-                        {task.tags.map((tag) => (
-                            <span
-                                key={tag}
-                                className="text-xs px-2 py-1 rounded-full"
-                                style={{ backgroundColor: tagColors[tag]?.bg, color: tagColors[tag]?.text }}
-                            >
-                                {tag}
-                            </span>
+                        {task.tags.map(tag => (
+                            <span key={tag} className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: tagColors[tag]?.bg, color: tagColors[tag]?.text }}>{tag}</span>
                         ))}
                     </div>
                 )}
             </div>
-
             {isModalOpen && <TaskEditModal task={task} onClose={() => setIsModalOpen(false)} />}
         </>
     );
