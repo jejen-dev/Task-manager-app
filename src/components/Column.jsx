@@ -6,24 +6,20 @@ import TaskCard from './TaskCard';
 // Komponen kolom (satu kolom dari kanban board)
 const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
     const { addTask, moveTask } = useBoards();
-    const [isAdding, setIsAdding] = useState(false); // Mode input task baru
+    const [isAdding, setIsAdding] = useState(false);
     const [newTaskName, setNewTaskName] = useState('');
-    const taskContainerRef = useRef(null); // Referensi container daftar task
-    const [isOverflow, setIsOverflow] = useState(false); // Apakah task overflow (scroll vertikal)
+    const taskContainerRef = useRef(null);
+    const [isOverflow, setIsOverflow] = useState(false);
 
-    // Drop target untuk menerima task dari kolom lain (antar kolom)
+    // DESAIN: Drop target untuk menerima task dari kolom lain (antar kolom)
     const [, dropRef] = useDrop({
         accept: 'TASK',
-        canDrop: (item) => {
-            // Hanya izinkan drop jika kolom sumber berbeda (mencegah drop di kolom sendiri)
-            return item.sourceColumnId !== columnId;
-        },
+        canDrop: (item) => item.sourceColumnId !== columnId,
         drop: (item) => {
             const sourceCol = item.sourceColumnId;
             const destCol = columnId;
             const sourceIndex = item.sourceIndex;
             if (sourceCol !== destCol) {
-                // Pindahkan task ke kolom ini, letakkan di indeks terakhir (tasks.length)
                 moveTask(activeBoardId, sourceCol, destCol, sourceIndex, tasks.length);
             }
             return { moved: true };
@@ -39,7 +35,6 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         }
     };
 
-    // Efek untuk memantau overflow saat tasks berubah atau resize
     useEffect(() => {
         checkOverflow();
         window.addEventListener('resize', checkOverflow);
@@ -51,7 +46,6 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         };
     }, [tasks]);
 
-    // Tambah task baru ke kolom Backlog (hanya untuk kolom Backlog)
     const handleAddTask = () => {
         const trimmed = newTaskName.trim();
         if (trimmed === '') {
@@ -75,48 +69,70 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         borderRadiusClass = 'rounded-r-lg rounded-l-none';
     }
 
+    // --- Penyesuaian padding berdasarkan kolom ---
+    // Backlog: padding kanan 0, kiri tetap 12px
+    // In Progress & In Review: padding kiri dan kanan 0
+    // Completed: padding kiri 0, kanan tetap 12px
+    let headerPaddingClass = '';
+    let taskContainerPaddingClass = '';
+    let footerPaddingClass = '';
+
+    if (columnId === 'Backlog') {
+        headerPaddingClass = 'pl-3 pr-0 pt-4 pb-5';
+        taskContainerPaddingClass = 'pl-3 pr-0';
+        footerPaddingClass = 'pl-3 pr-0';
+    } else if (columnId === 'Completed') {
+        headerPaddingClass = 'pl-0 pr-3 pt-4 pb-5';
+        taskContainerPaddingClass = 'pl-0 pr-3';
+        footerPaddingClass = 'pl-0 pr-3';
+    } else { // In Progress & In Review
+        headerPaddingClass = 'px-0 pt-4 pb-5';
+        taskContainerPaddingClass = 'px-0';
+        footerPaddingClass = 'px-0';
+    }
+    // -------------------------------------------
+
     return (
+        // DESAIN: Kolom: background #EEF4FC (light) / #3A3E44 (dark), border radius 12px (rounded-lg)
         <div
             ref={dropRef}
-            className={`
-                bg-[#EEF4FC] dark:bg-[#3A3E44] 
-                flex flex-col overflow-hidden h-full 
-                ${borderRadiusClass}
-                w-[320px] 
-                lg:w-auto lg:flex-1
-            `}
-            style={{ position: 'relative' }} // penting untuk drop target di dalam overflow container
+            className={`bg-[#EEF4FC] dark:bg-[#3A3E44] flex flex-col overflow-hidden h-full ${borderRadiusClass}`}
+            style={{ borderRadius: '12px', position: 'relative' }}
         >
-            {/* Header kolom: warna, judul, jumlah task */}
-            <div className="p-4">
+            {/* DESAIN: Header kolom: padding atas 16px, kiri/kanan 12px, bawah 8px (disesuaikan per kolom) */}
+            <div className={headerPaddingClass}>
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
-                    <h3 className="font-semibold text-black dark:text-white">{title}</h3>
+                    {/* Titik warna status ukuran 8x8 (w-2 h-2) */}
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
+                    <h3 className="font-semibold text-black dark:text-white text-sm">{title}</h3>
                     <span className="text-sm text-black dark:text-white">({tasks.length})</span>
                 </div>
             </div>
 
-            {/* Daftar task (scroll vertikal jika overflow) */}
+            {/* DESAIN: Daftar task dengan scroll vertikal jika overflow. Padding kiri/kanan 12px (disesuaikan) */}
             <div
                 ref={taskContainerRef}
-                className={`${isOverflow ? 'flex-1' : ''} overflow-y-auto p-3 hide-scrollbar`}
+                className={`${isOverflow ? 'flex-1' : ''} overflow-y-auto ${taskContainerPaddingClass} hide-scrollbar`}
                 style={{ minHeight: 0 }}
             >
-                {tasks.length === 0 ? (
-                    <div className="text-left text-[#7E878D] bg-transparent">No tasks</div>
-                ) : (
-                    tasks.map((task, index) => (
-                        <TaskCard key={task.id} task={task} index={index} columnId={columnId} />
-                    ))
-                )}
+                {/* DESAIN: Jarak antar task 20px (space-y-5), padding bawah 12px (pb-3) */}
+                <div className="space-y-5 pb-5">
+                    {tasks.length === 0 ? (
+                        <div className="text-left text-[#7E878D] bg-transparent">No tasks</div>
+                    ) : (
+                        tasks.map((task, index) => (
+                            <TaskCard key={task.id} task={task} index={index} columnId={columnId} />
+                        ))
+                    )}
+                </div>
             </div>
 
-            {/* Bagian add task (hanya untuk kolom Backlog) */}
-            <div className={`${isOverflow ? 'sticky bottom-0 bg-[#EEF4FC] dark:bg-[#3A3E44]' : ''}`} style={{ padding: '0.75rem', paddingTop: 0 }}>
+            {/* DESAIN: Tombol add task (hanya untuk kolom Backlog) - sticky jika overflow */}
+            <div className={`${isOverflow ? 'sticky bottom-0 bg-[#EEF4FC] dark:bg-[#3A3E44]' : ''} ${footerPaddingClass} pt-0 pb-4 ${isOverflow ? 'mt-5' : ''}`}>
                 {columnId === 'Backlog' && !isAdding && (
                     <button
                         onClick={() => setIsAdding(true)}
-                        className="w-full flex items-center justify-between px-4 py-2 rounded-lg"
+                        className="w-full flex items-center justify-between px-4 py-2 rounded-lg text-sm"
                         style={{ backgroundColor: '#c3dbfb', color: '#2b4ecf' }}
                     >
                         <span>Add new task</span>
@@ -129,19 +145,14 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
                             type="text"
                             value={newTaskName}
                             onChange={(e) => setNewTaskName(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleAddTask();
-                                }
-                            }}
+                            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddTask(); } }}
                             placeholder="Task name (max 100 chars)"
-                            className="w-full bg-transparent text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded px-2 py-1 mb-2"
+                            className="w-full bg-transparent text-black dark:text-white border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 mb-2 text-sm"
                             autoFocus
                         />
                         <div className="flex gap-2">
-                            <button onClick={handleAddTask} className="bg-blue-600 text-white px-3 py-1 rounded">Add</button>
-                            <button onClick={() => setIsAdding(false)} className="bg-gray-600 text-white px-3 py-1 rounded">Cancel</button>
+                            <button onClick={handleAddTask} className="bg-blue-600 text-white px-3 py-1 rounded-md">Add</button>
+                            <button onClick={() => setIsAdding(false)} className="bg-gray-600 text-white px-3 py-1 rounded-md">Cancel</button>
                         </div>
                     </div>
                 )}

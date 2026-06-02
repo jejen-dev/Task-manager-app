@@ -5,7 +5,9 @@ import BoardColumns from './components/BoardColumns';
 import { fetchAllBoards } from './utils/api';
 import LoadingSpinner from './components/LoadingSpinner';
 
+// Komponen utama App
 const App = () => {
+    // DESAIN: Dark mode state, diambil dari localStorage (default true)
     const [darkMode, setDarkMode] = useState(() => {
         const saved = localStorage.getItem('theme');
         return saved === 'dark' || (!saved && true);
@@ -14,6 +16,7 @@ const App = () => {
     const [activeBoardId, setActiveBoardId] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Efek untuk menerapkan dark mode class ke html dan simpan ke localStorage
     useEffect(() => {
         if (darkMode) {
             document.documentElement.classList.add('dark');
@@ -24,6 +27,7 @@ const App = () => {
         }
     }, [darkMode]);
 
+    // Efek awal: mengambil data board dari API atau fallback
     useEffect(() => {
         const loadBoards = async () => {
             setLoading(true);
@@ -41,8 +45,10 @@ const App = () => {
     }
 
     return (
+        // DESAIN: Container utama dengan min-height penuh, dark mode class
         <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-            <div className="flex h-screen p-3 gap-0 bg-white dark:bg-dark-bg">
+            {/* DESAIN: Flex container, padding 12px (p-3), background putih/gelap */}
+            <div className="flex h-screen p-3 bg-white dark:bg-dark-bg">
                 <BoardsProvider
                     boards={boardsData}
                     setBoards={setBoardsData}

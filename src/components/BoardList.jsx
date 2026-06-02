@@ -15,33 +15,35 @@ const BoardList = () => {
 
     // Memotong nama board jika lebih dari 25 karakter
     const truncateBoardName = (name) => {
-        if (name.length > 25) {
-            return name.substring(0, 25) + '...';
-        }
+        if (name.length > 25) return name.substring(0, 25) + '...';
         return name;
     };
 
     return (
         <div className="space-y-2">
             {Object.values(boards).map((board) => (
+                // DESAIN: Setiap item board: lebar 272px, tinggi 48px, border radius 45px (rounded-[45px])
+                // Board aktif: background transparan, border solid #3662E3; board tidak aktif: hover background abu-abu
                 <div
                     key={board.id}
                     onClick={() => setActiveBoardId(board.id)}
-                    className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${activeBoardId === board.id
-                        ? 'bg-accent-blue-light dark:bg-accent-blue bg-opacity-60 dark:bg-opacity-30'
+                    className={`flex items-center justify-between w-[272px] h-12 rounded-[45px] cursor-pointer transition-all ${activeBoardId === board.id
+                        ? 'bg-transparent border border-[#3662E3]'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                         }`}
                 >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-3 flex-1 min-w-0 pl-2 pr-2">
+                        {/* DESAIN: Icon board ukuran 32x32 (w-8 h-8), rounded-full */}
                         <img src={board.logoUrl} alt={board.name} className="w-8 h-8 rounded-full flex-shrink-0" />
-                        <span className="text-black dark:text-dark-text font-medium break-words flex-1 min-w-0">
+                        {/* DESAIN: Nama board: teks 14px (text-sm), padding atas/bawah 15px, kiri 10px */}
+                        <span className="text-black dark:text-dark-text font-medium text-sm py-[15px] pl-2.5 truncate">
                             {truncateBoardName(board.name)}
                         </span>
                     </div>
-                    {/* Tombol hapus hanya muncul jika jumlah board > 1 (tidak boleh hapus board terakhir) */}
+                    {/* DESAIN: Tombol hapus (X) hanya muncul jika jumlah board > 1 */}
                     {Object.keys(boards).length > 1 && (
-                        <button onClick={(e) => handleDelete(board.id, e)} className="text-red-500 hover:text-red-700 opacity-50 hover:opacity-100 transition-opacity flex-shrink-0">
-                            <img src="/resources/icons/Close_round.svg" alt="Delete" className="w-4 h-4 filter dark:invert-0 invert" />
+                        <button onClick={(e) => handleDelete(board.id, e)} className="text-red-950 dark:text-red-950 hover:text-red-800 dark:hover:text-red-800 flex-shrink-0 mr-2">
+                            <img src="/resources/icons/Close_round.svg" alt="Delete" className="w-4 h-4" brightness="0" />
                         </button>
                     )}
                 </div>

@@ -12,14 +12,8 @@ const TaskCard = ({ task, index, columnId }) => {
     // Drag source: memungkinkan task di-drag
     const [{ isDragging }, dragRef] = useDrag({
         type: 'TASK',
-        item: () => ({
-            taskId: task.id,
-            sourceColumnId: columnId,
-            sourceIndex: index,
-        }),
-        collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
-        }),
+        item: () => ({ taskId: task.id, sourceColumnId: columnId, sourceIndex: index }),
+        collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
     });
 
     // Drop target untuk reordering dalam satu kolom (mengubah urutan)
@@ -27,17 +21,13 @@ const TaskCard = ({ task, index, columnId }) => {
         accept: 'TASK',
         hover: (item, monitor) => {
             if (!ref.current) return;
-
             const dragIndex = item.sourceIndex;
             const hoverIndex = index;
             const dragColumn = item.sourceColumnId;
             const hoverColumn = columnId;
-
-            // Hanya proses jika dalam kolom yang sama
             if (dragColumn !== hoverColumn) return;
             if (dragIndex === hoverIndex) return;
 
-            // Hitung posisi mouse relatif terhadap task target
             const hoverBoundingRect = ref.current.getBoundingClientRect();
             const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
             const clientOffset = monitor.getClientOffset();
@@ -45,29 +35,17 @@ const TaskCard = ({ task, index, columnId }) => {
             const hoverClientY = clientOffset.y - hoverBoundingRect.top;
 
             let newIndex = hoverIndex;
-            // Tentukan apakah task akan ditempatkan sebelum atau sesudah target
-            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-                return;
-            }
-            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-                return;
-            }
-            if (dragIndex < hoverIndex && hoverClientY > hoverMiddleY) {
-                newIndex = hoverIndex + 1;
-            } else if (dragIndex > hoverIndex && hoverClientY < hoverMiddleY) {
-                newIndex = hoverIndex;
-            }
+            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+            if (dragIndex < hoverIndex && hoverClientY > hoverMiddleY) newIndex = hoverIndex + 1;
+            else if (dragIndex > hoverIndex && hoverClientY < hoverMiddleY) newIndex = hoverIndex;
 
-            // Pindahkan task dalam kolom yang sama
             moveTask(activeBoardId, dragColumn, hoverColumn, dragIndex, newIndex);
-            item.sourceIndex = newIndex; // Update indeks untuk hover berikutnya
+            item.sourceIndex = newIndex;
         },
-        collect: (monitor) => ({
-            isOver: !!monitor.isOver(),
-        }),
+        collect: (monitor) => ({ isOver: !!monitor.isOver() }),
     });
 
-    // Gabungkan drag dan drop ref ke elemen yang sama
     dragRef(dropRef(ref));
 
     // Warna untuk setiap tag (berdasarkan nama)
@@ -78,41 +56,58 @@ const TaskCard = ({ task, index, columnId }) => {
         'Front-end': { bg: '#E2FBE9', text: '#64AF6C' }
     };
 
-    // Memotong nama task jika lebih dari 100 karakter
     const truncateTaskName = (name) => {
         if (name.length > 100) return name.substring(0, 100) + '...';
         return name;
     };
 
-    // Handler klik: buka modal edit hanya jika tidak sedang drag
     const handleClick = (e) => {
         if (!isDragging) setIsModalOpen(true);
     };
 
     return (
         <>
+            {/* DESAIN: Task card: background putih/gelap, border radius 12px, padding 12px (p-3), margin bottom diatur oleh parent (space-y-5) */}
             <div
                 ref={ref}
                 onClick={handleClick}
-                className={`bg-white dark:bg-[#191B1F] rounded-lg p-3 mb-3 shadow-sm cursor-grab hover:shadow-md transition-shadow 
+                className={`bg-white dark:bg-[#191B1F] rounded-lg p-3 shadow-sm cursor-grab hover:shadow-md transition-shadow 
                     ${isDragging ? 'opacity-50 cursor-grabbing' : ''} 
                     ${isOver ? 'border-2 border-blue-400' : ''}`}
+                style={{ borderRadius: '12px' }}
             >
-                {/* Cover image jika ada */}
-                {task.coverImage && <img src={task.coverImage} alt="Task cover" className="w-full h-32 object-cover rounded-md mb-2" />}
-                {/* Nama task */}
-                <h4 className="text-sm font-medium text-black dark:text-white mb-2 break-words">{truncateTaskName(task.name)}</h4>
-                {/* Tags */}
+                {/* DESAIN: Cover image jika ada: lebar penuh, tinggi 128px (h-32), object cover, border radius 8px (rounded-md), margin bottom 12px (mb-3) */}
+                {task.coverImage && (
+                    <img src={task.coverImage} alt="Task cover" className="w-full h-32 object-cover rounded-md mb-3" style={{ borderRadius: '8px' }} />
+                )}
+                {/* DESAIN: Nama task: teks 14px (text-sm), margin bottom 12px (mb-3) */}
+                <h4 className="text-sm font-medium text-black dark:text-white mb-3 break-words">{truncateTaskName(task.name)}</h4>
+                {/* DESAIN: Tags: flex wrap, gap 4px (gap-1). Setiap tag: ukuran 44x14 (lebar 44px, tinggi 14px), text size 8px, border radius 4px */}
                 {task.tags && task.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {task.tags.map(tag => (
-                            <span key={tag} className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: tagColors[tag]?.bg, color: tagColors[tag]?.text }}>{tag}</span>
+                            <span
+                                key={tag}
+                                className={`inline-flex items-center justify-center font-medium rounded ${tag === 'Front-end'
+                                    ? 'text-[8px] px-2 py-0.5'
+                                    : 'text-[8px] px-1 py-0.5'
+                                    }`}
+                                style={{
+                                    backgroundColor: tagColors[tag]?.bg,
+                                    color: tagColors[tag]?.text,
+                                    width: tag === 'Front-end' ? 'auto' : '44px',
+                                    height: '14px',  // semua tag tinggi 14px
+                                    borderRadius: '4px'
+                                }}
+                            >
+                                {tag}
+                            </span>
                         ))}
                     </div>
                 )}
-            </div>
-            {/* Modal edit task */}
-            {isModalOpen && <TaskEditModal task={task} onClose={() => setIsModalOpen(false)} />}
+            </div >
+            {isModalOpen && <TaskEditModal task={task} onClose={() => setIsModalOpen(false)} />
+            }
         </>
     );
 };

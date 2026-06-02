@@ -13,7 +13,6 @@ const statusColors = {
     'Completed': '#77db89'
 };
 
-// Warna latar dan teks untuk setiap tag
 const tagColors = {
     'Concept': { bg: '#F9E4E3', text: '#B64B44' },
     'Technical': { bg: '#DEE9FC', text: '#5076E7' },
@@ -30,18 +29,20 @@ const TaskEditModal = ({ task, onClose }) => {
     const [selectedTags, setSelectedTags] = useState(task.tags || []);
     const [coverImage, setCoverImage] = useState(task.coverImage || null);
     const [loadingImage, setLoadingImage] = useState(false);
-    const [isStatusOpen, setIsStatusOpen] = useState(false); // Dropdown status terbuka?
-    const [isTagsOpen, setIsTagsOpen] = useState(false); // Dropdown tags terbuka?
-    const tagsDropdownRef = useRef(null); // Referensi dropdown tags untuk deteksi klik di luar
+    const [isStatusOpen, setIsStatusOpen] = useState(false);
+    const [isTagsOpen, setIsTagsOpen] = useState(false);
+    const tagsDropdownRef = useRef(null);
+
+    // State dan ref untuk kontrol tampilan tombol overlay pada cover image
+    const [showCoverButtons, setShowCoverButtons] = useState(false);
+    const coverContainerRef = useRef(null);
 
     // Toggle tag: tambah/hapus, batasi maksimal 4 tag
     const toggleTag = (tag) => {
         if (selectedTags.includes(tag)) {
             setSelectedTags(selectedTags.filter(t => t !== tag));
         } else {
-            if (selectedTags.length < 4) {
-                setSelectedTags([...selectedTags, tag]);
-            }
+            if (selectedTags.length < 4) setSelectedTags([...selectedTags, tag]);
         }
     };
 
@@ -56,6 +57,17 @@ const TaskEditModal = ({ task, onClose }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Menyembunyikan tombol overlay jika klik di luar area cover image
+    useEffect(() => {
+        const handleClickOutsideCover = (event) => {
+            if (coverContainerRef.current && !coverContainerRef.current.contains(event.target)) {
+                setShowCoverButtons(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutsideCover);
+        return () => document.removeEventListener('mousedown', handleClickOutsideCover);
+    }, []);
+
     // Menambahkan cover image random dari picsum
     const addRandomCoverImage = async () => {
         setLoadingImage(true);
@@ -64,7 +76,6 @@ const TaskEditModal = ({ task, onClose }) => {
             const imageUrl = `https://picsum.photos/id/${randomId}/300/200`;
             setCoverImage(imageUrl);
         } catch (error) {
-            console.error('Error fetching image:', error);
             alert('Failed to load image');
         } finally {
             setLoadingImage(false);
@@ -76,9 +87,7 @@ const TaskEditModal = ({ task, onClose }) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onloadend = () => {
-                setCoverImage(reader.result);
-            };
+            reader.onloadend = () => setCoverImage(reader.result);
             reader.readAsDataURL(file);
         }
     };
@@ -86,6 +95,7 @@ const TaskEditModal = ({ task, onClose }) => {
     // Hapus cover image
     const removeCoverImage = () => {
         setCoverImage(null);
+        setShowCoverButtons(false);
     };
 
     // Simpan perubahan task
@@ -95,7 +105,6 @@ const TaskEditModal = ({ task, onClose }) => {
             alert('Task name is required');
             return;
         }
-
         if (trimmed.length > 100) {
             alert('Task name cannot exceed 100 characters');
             return;
@@ -106,80 +115,105 @@ const TaskEditModal = ({ task, onClose }) => {
             tags: selectedTags,
             coverImage
         });
-        onClose(); // Tutup modal setelah save
+        onClose();
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-dark-card rounded-lg shadow-xl max-w-md w-full">
-                {/* Header modal */}
-                <div className="flex justify-between items-center px-6 py-4 pb-2">
+        <div className="fixed -inset-10 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-dark-card rounded-lg shadow-xl w-[520px]">
+                <div className="p-8 space-y-8">
                     <h2 className="text-xl font-semibold text-black dark:text-dark-text">Task details</h2>
-                    <button onClick={onClose} className="text-black dark:text-dark-secondary hover:text-gray-700 dark:hover:text-gray-300">
-                        <img src="/resources/icons/Close_round.svg" alt="Close" className="w-6 h-6 filter dark:invert-0 invert" />
-                    </button>
-                </div>
 
-                <div className="px-6 pt-1 pb-4 space-y-4">
                     {/* Bagian Cover Image */}
-                    <div>
+                    <div ref={coverContainerRef}>
                         {coverImage ? (
-                            <div className="mb-3">
-                                <img src={coverImage} alt="Cover" className="w-full h-40 object-cover rounded-lg mb-2" />
-                                <button onClick={removeCoverImage} className="text-sm text-red-500 hover:text-red-700">Remove Cover</button>
+                            <div className="relative mb-4">
+                                <img
+                                    src={coverImage}
+                                    alt="Cover"
+                                    className="w-full h-40 object-cover rounded-lg cursor-pointer"
+                                    style={{ borderRadius: '8px' }}
+                                    onClick={() => setShowCoverButtons(true)}
+                                />
+                                {showCoverButtons && (
+                                    <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black bg-opacity-50 rounded-lg">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                addRandomCoverImage();
+                                            }}
+                                            disabled={loadingImage}
+                                            className="px-4 py-2 bg-[#3662E3] text-white rounded-full text-sm disabled:opacity-50"
+                                        >
+                                            Random Cover
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeCoverImage();
+                                            }}
+                                            className="px-4 py-2 bg-[#DD524C] text-white rounded-full text-sm"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ) : (
-                            <div className="text-center py-4 bg-gray-100 dark:bg-gray-800 rounded-lg mb-2">
-                                <span className="text-black dark:text-dark-secondary">No cover</span>
+                            <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg h-40 flex items-center justify-center mb-4">
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={addRandomCoverImage}
+                                        disabled={loadingImage}
+                                        className="px-4 py-2 bg-[#3662E3] text-white rounded-full text-sm disabled:opacity-50"
+                                    >
+                                        Random Cover
+                                    </button>
+                                    <label className="px-4 py-2 bg-[#DD524C] text-white rounded-full text-sm cursor-pointer">
+                                        Upload Cover
+                                        <input type="file" accept="image/*" onChange={handleUploadCover} className="hidden" />
+                                    </label>
+                                </div>
                             </div>
                         )}
-                        <div className="flex gap-2">
-                            <button onClick={addRandomCoverImage} disabled={loadingImage} className="px-3 py-1 text-sm bg-accent-blue text-white rounded-lg hover:bg-opacity-90 disabled:opacity-50">
-                                {loadingImage ? 'Loading...' : 'Random Cover'}
-                            </button>
-                            <label className="px-3 py-1 text-sm bg-accent-blue text-white rounded-lg hover:bg-opacity-90 cursor-pointer">
-                                Upload Cover
-                                <input type="file" accept="image/*" onChange={handleUploadCover} className="hidden" />
-                            </label>
-                        </div>
                     </div>
 
                     {/* Task Name */}
                     <div>
-                        <label className="block text-sm font-medium text-black dark:text-dark-text mb-2">Task name</label>
+                        <label className="block text-sm font-medium text-[#7E878D] mb-2">Task name</label>
                         <input
                             type="text"
                             value={taskName}
                             onChange={(e) => setTaskName(e.target.value)}
                             placeholder="Enter task name (max 100 chars)"
-                            className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text"
+                            className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text text-base focus:border-[#3662E3] focus:ring-1 focus:ring-[#3662E3] focus:outline-none"
                         />
                     </div>
 
                     {/* Status Dropdown */}
                     <div>
-                        <label className="block text-sm font-medium text-black dark:text-dark-text mb-2">Status</label>
+                        <label className="block text-sm font-medium text-[#7E878D] mb-2">Status</label>
                         <div className="relative">
                             <button
                                 onClick={() => setIsStatusOpen(!isStatusOpen)}
-                                className="w-full flex items-center gap-2 px-3 py-2 border rounded-lg bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text text-left"
+                                className="w-full flex items-center gap-2 px-3 py-2 border rounded-xl bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text text-left focus:border-[#3662E3] focus:ring-1 focus:ring-[#3662E3] focus:outline-none"
                             >
-                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: statusColors[status] }}></div>
-                                <span>{status}</span>
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColors[status] }}></div>
+                                <span className="text-sm">{status}</span>
                                 <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
                             {isStatusOpen && (
-                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                <div className="absolute z-10 w-full mt-1 bg-[#191B1F] border border-gray-700 rounded-lg shadow-lg p-1">
                                     {STATUSES.map(s => (
                                         <button
                                             key={s}
                                             onClick={() => { setStatus(s); setIsStatusOpen(false); }}
-                                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-black dark:text-dark-text"
+                                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#3662E3] transition-colors text-white text-left rounded-md"
                                         >
-                                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: statusColors[s] }}></div>
-                                            <span>{s}</span>
+                                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColors[s] }}></div>
+                                            <span className="text-sm">{s}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -187,35 +221,39 @@ const TaskEditModal = ({ task, onClose }) => {
                         </div>
                     </div>
 
-                    {/* Tags Dropdown (multi-select) */}
+                    {/* Tags Dropdown */}
                     <div>
-                        <label className="block text-sm font-medium text-black dark:text-dark-text mb-2">Tags</label>
+                        <label className="block text-sm font-medium text-[#7E878D] mb-2">Tags</label>
                         <div className="relative" ref={tagsDropdownRef}>
                             <button
                                 onClick={() => setIsTagsOpen(!isTagsOpen)}
-                                className="w-full px-3 py-2 border rounded-lg bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-left flex flex-wrap gap-1 items-center min-h-[42px]"
+                                className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-left flex flex-wrap gap-1 items-center min-h-[42px] focus:border-[#3662E3] focus:ring-1 focus:ring-[#3662E3] focus:outline-none"
                             >
-                                {selectedTags.length === 0 ? <span className="text-gray-500 dark:text-dark-secondary">Select tags</span> : selectedTags.map(tag => (
-                                    <span key={tag} className="inline-block px-2 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: tagColors[tag]?.bg, color: tagColors[tag]?.text }}>{tag}</span>
-                                ))}
+                                {selectedTags.length === 0 ? (
+                                    <span className="text-gray-500 dark:text-dark-secondary text-sm">Select tags</span>
+                                ) : (
+                                    selectedTags.map(tag => (
+                                        <span key={tag} className="inline-block px-2 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: tagColors[tag]?.bg, color: tagColors[tag]?.text, borderRadius: '4px' }}>{tag}</span>
+                                    ))
+                                )}
                                 <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
                             {isTagsOpen && (
-                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-dark-card border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-1">
+                                <div className="absolute z-10 w-full mt-1 bg-[#191B1F] border border-gray-700 rounded-lg shadow-lg p-1">
                                     {TAGS.map(tag => {
                                         const isSelected = selectedTags.includes(tag);
                                         return (
                                             <button
                                                 key={tag}
                                                 onClick={() => toggleTag(tag)}
-                                                className="w-full text-left px-3 py-2 rounded-md transition-colors mb-1 last:mb-0"
-                                                style={{ backgroundColor: isSelected ? tagColors[tag]?.bg : (tagColors[tag]?.bg + '80'), color: tagColors[tag]?.text }}
-                                                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = tagColors[tag]?.bg; }}
-                                                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = tagColors[tag]?.bg + '80'; }}
+                                                className="w-full text-left px-3 py-2 rounded-md transition-colors mb-1 last:mb-0 text-white text-sm"
+                                                style={{ backgroundColor: isSelected ? tagColors[tag]?.bg : 'transparent', color: isSelected ? tagColors[tag]?.text : 'white' }}
+                                                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = '#3662E3'; }}
+                                                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent'; }}
                                             >
-                                                <span className="text-sm font-medium">{tag}</span>
+                                                {tag}
                                             </button>
                                         );
                                     })}
@@ -223,16 +261,22 @@ const TaskEditModal = ({ task, onClose }) => {
                             )}
                         </div>
                     </div>
-                </div>
 
-                {/* Footer modal: tombol Save dan Cancel */}
-                <div className="flex items-center gap-3 px-6 py-4 pt-2">
-                    <button onClick={handleSave} className="px-4 py-2 text-white rounded-lg hover:bg-opacity-90 flex items-center gap-2" style={{ backgroundColor: '#3762e4' }}>
-                        <span>Save</span>
-                        <img src="/resources/icons/Done_round.svg" alt="Save" className="w-5 h-5" />
-                    </button>
-                    <button onClick={onClose} className="px-4 py-2 text-black dark:text-dark-secondary border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition">Cancel</button>
-                    <div className="flex-1"></div>
+                    <div className="flex gap-4 pt-4">
+                        <button
+                            onClick={handleSave}
+                            className="flex-1 px-4 py-2 bg-[#3662E3] text-white rounded-full text-sm flex items-center justify-center gap-2"
+                        >
+                            <span>Save</span>
+                            <img src="/resources/icons/Done_round.svg" alt="check" className="w-4 h-4 filter brightness-0 invert" />
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2 text-[#7E878D] border border-gray-300 dark:border-gray-600 rounded-full text-sm"
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
