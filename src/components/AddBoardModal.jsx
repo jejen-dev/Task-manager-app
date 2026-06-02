@@ -44,7 +44,7 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl w-full max-w-[450px] mx-auto">
+            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl w-full max-w-[450px] lg:max-w-xl mx-auto">
                 <div className="p-5 sm:p-8 space-y-5 sm:space-y-8">
                     <h2 className="text-xl font-semibold text-black dark:text-dark-text">New board</h2>
 
@@ -63,7 +63,7 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
 
                     <div>
                         <label className="block text-sm font-medium text-[#7E878D] mb-2">Logo</label>
-                        <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-6">
+                        <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-6 lg:gap-8">
                             {emojiLogos.map((logo, idx) => (
                                 <button
                                     key={idx}
