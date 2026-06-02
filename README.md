@@ -2,8 +2,6 @@
 
 Aplikasi manajemen tugas modern dengan antarmuka **kanban board** yang intuitif. Proyek ini dikembangkan sebagai submission untuk tantangan dari [devChallenges.io](https://devchallenges.io/) untuk mengasah keterampilan **HTML, CSS, dan JavaScript** dengan menerapkan konsep drag-and-drop dan dark mode.[reference:0]
 
-![Demo App](https://via.placeholder.com/800x400?text=Task+Manager+App+Screenshot)
-
 > 🔗 **Live Demo**: [task-manager-app-steel-ten.vercel.app](https://task-manager-app-steel-ten.vercel.app)
 
 ## ✨ Fitur Utama
