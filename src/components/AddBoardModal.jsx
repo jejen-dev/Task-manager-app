@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-// Daftar path logo board yang tersedia (13 pilihan)
 const emojiLogos = [
     '/resources/emojis/board-logo-01.png',
     '/resources/emojis/board-logo-02.png',
@@ -17,7 +16,6 @@ const emojiLogos = [
     '/resources/emojis/board-logo-13.png'
 ];
 
-// Komponen modal untuk menambah board baru
 const AddBoardModal = ({ onClose, onAddBoard }) => {
     const [boardName, setBoardName] = useState('');
     const [selectedLogo, setSelectedLogo] = useState(emojiLogos[0]);
@@ -46,8 +44,8 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-dark-card rounded-lg shadow-xl w-[520px]">
-                <div className="p-8 space-y-8">
+            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl w-full max-w-[450px] mx-auto">
+                <div className="p-5 sm:p-8 space-y-5 sm:space-y-8">
                     <h2 className="text-xl font-semibold text-black dark:text-dark-text">New board</h2>
 
                     <div>
@@ -65,14 +63,14 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
 
                     <div>
                         <label className="block text-sm font-medium text-[#7E878D] mb-2">Logo</label>
-                        <div className="grid grid-cols-8 gap-6">
+                        <div className="grid grid-cols-4 lg:grid-cols-8 gap-4 sm:gap-6">
                             {emojiLogos.map((logo, idx) => (
                                 <button
                                     key={idx}
                                     onClick={() => setSelectedLogo(logo)}
-                                    className={`w-12 h-12 rounded-full focus:outline-none transition-all ${selectedLogo === logo
-                                        ? 'ring-2 ring-[#3662E3] ring-offset-2 ring-offset-white dark:ring-offset-dark-card'
-                                        : ''
+                                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full focus:outline-none transition-all ${selectedLogo === logo
+                                            ? 'ring-2 ring-[#3662E3] ring-offset-2 ring-offset-white dark:ring-offset-dark-card'
+                                            : ''
                                         }`}
                                 >
                                     <img
@@ -85,17 +83,17 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                         </div>
                     </div>
 
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex gap-3 sm:gap-4 pt-2 sm:pt-4">
                         <button
                             onClick={handleSubmit}
-                            className="flex-1 px-4 py-2 bg-[#3662E3] text-white rounded-full hover:bg-opacity-90 text-sm flex items-center justify-center gap-2"
+                            className="flex-1 px-3 py-2 sm:px-4 bg-[#3662E3] text-white rounded-full hover:bg-opacity-90 text-sm sm:text-base flex items-center justify-center gap-2"
                         >
                             <span>Create board</span>
                             <img src="/resources/icons/Done_round.svg" alt="check" className="w-4 h-4 filter brightness-0 invert" />
                         </button>
                         <button
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 text-[#7E878D] border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-sm"
+                            className="flex-1 px-3 py-2 sm:px-4 text-[#7E878D] border border-gray-300 dark:border-gray-600 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-sm sm:text-base"
                         >
                             Cancel
                         </button>

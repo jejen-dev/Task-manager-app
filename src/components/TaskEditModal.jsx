@@ -119,9 +119,9 @@ const TaskEditModal = ({ task, onClose }) => {
     };
 
     return (
-        <div className="fixed -inset-10 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white dark:bg-dark-card rounded-lg shadow-xl w-[520px]">
-                <div className="p-8 space-y-8">
+        <div className="fixed inset-0 -top-[20px] bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-xl w-full max-w-[450px] sm:max-w-[520px] mx-auto">
+                <div className="p-5 sm:p-8 space-y-5 sm:space-y-8">
                     <h2 className="text-xl font-semibold text-black dark:text-dark-text">Task details</h2>
 
                     {/* Bagian Cover Image */}
@@ -131,19 +131,19 @@ const TaskEditModal = ({ task, onClose }) => {
                                 <img
                                     src={coverImage}
                                     alt="Cover"
-                                    className="w-full h-40 object-cover rounded-lg cursor-pointer"
+                                    className="w-full h-36 sm:h-40 object-cover rounded-lg cursor-pointer"
                                     style={{ borderRadius: '8px' }}
                                     onClick={() => setShowCoverButtons(true)}
                                 />
                                 {showCoverButtons && (
-                                    <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black bg-opacity-50 rounded-lg">
+                                    <div className="absolute inset-0 flex items-center justify-center gap-2 sm:gap-3 bg-black bg-opacity-50 rounded-lg">
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 addRandomCoverImage();
                                             }}
                                             disabled={loadingImage}
-                                            className="px-4 py-2 bg-[#3662E3] text-white rounded-full text-sm disabled:opacity-50"
+                                            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#3662E3] text-white rounded-full text-xs sm:text-sm disabled:opacity-50"
                                         >
                                             Random Cover
                                         </button>
@@ -152,7 +152,7 @@ const TaskEditModal = ({ task, onClose }) => {
                                                 e.stopPropagation();
                                                 removeCoverImage();
                                             }}
-                                            className="px-4 py-2 bg-[#DD524C] text-white rounded-full text-sm"
+                                            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#DD524C] text-white rounded-full text-xs sm:text-sm"
                                         >
                                             Remove
                                         </button>
@@ -160,16 +160,16 @@ const TaskEditModal = ({ task, onClose }) => {
                                 )}
                             </div>
                         ) : (
-                            <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg h-40 flex items-center justify-center mb-4">
-                                <div className="flex gap-3">
+                            <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg h-36 sm:h-40 flex items-center justify-center mb-4">
+                                <div className="flex gap-2 sm:gap-3">
                                     <button
                                         onClick={addRandomCoverImage}
                                         disabled={loadingImage}
-                                        className="px-4 py-2 bg-[#3662E3] text-white rounded-full text-sm disabled:opacity-50"
+                                        className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#3662E3] text-white rounded-full text-xs sm:text-sm disabled:opacity-50"
                                     >
                                         Random Cover
                                     </button>
-                                    <label className="px-4 py-2 bg-[#DD524C] text-white rounded-full text-sm cursor-pointer">
+                                    <label className="px-3 py-1.5 sm:px-4 sm:py-2 bg-[#DD524C] text-white rounded-full text-xs sm:text-sm cursor-pointer">
                                         Upload Cover
                                         <input type="file" accept="image/*" onChange={handleUploadCover} className="hidden" />
                                     </label>
@@ -196,10 +196,10 @@ const TaskEditModal = ({ task, onClose }) => {
                         <div className="relative">
                             <button
                                 onClick={() => setIsStatusOpen(!isStatusOpen)}
-                                className="w-full flex items-center gap-2 px-3 py-2 border rounded-xl bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text text-left focus:border-[#3662E3] focus:ring-1 focus:ring-[#3662E3] focus:outline-none"
+                                className="w-full flex items-center gap-2 px-3 py-2 border rounded-xl bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-black dark:text-dark-text text-left focus:border-[#3662E3] focus:ring-1 focus:ring-[#3662E3] focus:outline-none text-sm sm:text-base"
                             >
                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColors[status] }}></div>
-                                <span className="text-sm">{status}</span>
+                                <span>{status}</span>
                                 <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                 </svg>
@@ -210,10 +210,10 @@ const TaskEditModal = ({ task, onClose }) => {
                                         <button
                                             key={s}
                                             onClick={() => { setStatus(s); setIsStatusOpen(false); }}
-                                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#3662E3] transition-colors text-white text-left rounded-md"
+                                            className="w-full flex items-center gap-2 px-3 py-2 hover:bg-[#3662E3] transition-colors text-white text-left rounded-md text-sm"
                                         >
                                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColors[s] }}></div>
-                                            <span className="text-sm">{s}</span>
+                                            <span>{s}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -227,10 +227,10 @@ const TaskEditModal = ({ task, onClose }) => {
                         <div className="relative" ref={tagsDropdownRef}>
                             <button
                                 onClick={() => setIsTagsOpen(!isTagsOpen)}
-                                className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-left flex flex-wrap gap-1 items-center min-h-[42px] focus:border-[#3662E3] focus:ring-1 focus:ring-[#3662E3] focus:outline-none"
+                                className="w-full px-3 py-2 border rounded-xl bg-white dark:bg-dark-card border-gray-300 dark:border-gray-600 text-left flex flex-wrap gap-1 items-center min-h-[42px] focus:border-[#3662E3] focus:ring-1 focus:ring-[#3662E3] focus:outline-none text-sm"
                             >
                                 {selectedTags.length === 0 ? (
-                                    <span className="text-gray-500 dark:text-dark-secondary text-sm">Select tags</span>
+                                    <span className="text-gray-500 dark:text-dark-secondary">Select tags</span>
                                 ) : (
                                     selectedTags.map(tag => (
                                         <span key={tag} className="inline-block px-2 py-1 rounded-md text-xs font-medium" style={{ backgroundColor: tagColors[tag]?.bg, color: tagColors[tag]?.text, borderRadius: '4px' }}>{tag}</span>
@@ -241,7 +241,7 @@ const TaskEditModal = ({ task, onClose }) => {
                                 </svg>
                             </button>
                             {isTagsOpen && (
-                                <div className="absolute z-10 w-full mt-1 bg-[#191B1F] border border-gray-700 rounded-lg shadow-lg p-1">
+                                <div className="absolute z-10 w-full mt-1 bg-[#191B1F] border border-gray-700 rounded-lg shadow-lg p-1 max-h-60 overflow-y-auto">
                                     {TAGS.map(tag => {
                                         const isSelected = selectedTags.includes(tag);
                                         return (
@@ -262,17 +262,18 @@ const TaskEditModal = ({ task, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="flex gap-4 pt-4">
+                    {/* Tombol Save dan Cancel */}
+                    <div className="flex gap-3 sm:gap-4 pt-2 sm:pt-4">
                         <button
                             onClick={handleSave}
-                            className="flex-1 px-4 py-2 bg-[#3662E3] text-white rounded-full text-sm flex items-center justify-center gap-2"
+                            className="flex-1 px-3 py-2 sm:px-4 bg-[#3662E3] text-white rounded-full text-sm sm:text-base flex items-center justify-center gap-2"
                         >
                             <span>Save</span>
                             <img src="/resources/icons/Done_round.svg" alt="check" className="w-4 h-4 filter brightness-0 invert" />
                         </button>
                         <button
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 text-[#7E878D] border border-gray-300 dark:border-gray-600 rounded-full text-sm"
+                            className="flex-1 px-3 py-2 sm:px-4 text-[#7E878D] border border-gray-300 dark:border-gray-600 rounded-full text-sm sm:text-base"
                         >
                             Cancel
                         </button>
