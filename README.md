@@ -33,37 +33,18 @@ Pastikan Anda telah menginstal **Node.js** (versi 18 atau lebih baru) di kompute
    git clone https://github.com/jejen-dev/Task-manager-app.git
    cd Task-manager-app
 
-📁 Struktur Folder
-text
-src/
-├── components/
-│   ├── AddBoardModal.jsx      # Modal untuk menambah board
-│   ├── AddTaskButton.jsx      # Tombol "Add new task"
-│   ├── BoardColumns.jsx       # Mengatur kolom kanban dan backend drag-and-drop
-│   ├── BoardList.jsx          # Daftar board di sidebar
-│   ├── Column.jsx             # Komponen kolom (Backlog, In Progress, dll)
-│   ├── LoadingSpinner.jsx     # Indikator loading saat mengambil data awal
-│   ├── Sidebar.jsx            # Sidebar untuk navigasi board dan tema
-│   ├── TaskCard.jsx           # Kartu tugas yang dapat di-drag
-│   └── TaskEditModal.jsx      # Modal untuk mengedit detail tugas
-├── contexts/
-│   └── BoardsContext.jsx      # Context provider untuk data board dan operasinya
-├── utils/
-│   └── api.js                 # Fungsi mengambil data board dari API eksternal
-├── App.jsx                    # Komponen utama aplikasi
-└── main.jsx                   # Entry point React
 🧠 Refleksi Pengembangan
 Proyek ini memberikan pengalaman berharga dalam beberapa aspek:
 
-Penerapan Drag-and-Drop – Menggunakan react-dnd untuk membuat antarmuka kanban yang interaktif. Tantangan utamanya adalah menangani perpindahan tugas antar kolom dengan posisi indeks yang tepat serta mendukung perangkat sentuh.
+- Penerapan Drag-and-Drop – Menggunakan react-dnd untuk membuat antarmuka kanban yang interaktif. Tantangan utamanya adalah menangani perpindahan tugas antar kolom dengan posisi indeks yang tepat serta mendukung perangkat sentuh.
 
-Manajemen State Kompleks – Menggunakan Context API untuk mengelola data board yang bersarang (board → kolom → daftar tugas). Operasi seperti moveTask dan updateTask memerlukan pembaruan state yang immutable dan efisien.
+- Manajemen State Kompleks – Menggunakan Context API untuk mengelola data board yang bersarang (board → kolom → daftar tugas). Operasi seperti moveTask dan updateTask memerlukan pembaruan state yang immutable dan efisien.
 
-Dark Mode – Menerapkan tema gelap dengan bantuan Tailwind CSS dan kelas dark: yang disediakan, serta menyimpan preferensi pengguna ke localStorage.
+- Dark Mode – Menerapkan tema gelap dengan bantuan Tailwind CSS dan kelas dark: yang disediakan, serta menyimpan preferensi pengguna ke localStorage.
 
-Integrasi API – Mengambil data board awal dari endpoint JSON milik devChallenges.io. Data kemudian ditransformasi ke dalam struktur yang sesuai dengan aplikasi, dengan fallback board jika API bermasalah.
+- Integrasi API – Mengambil data board awal dari endpoint JSON milik devChallenges.io. Data kemudian ditransformasi ke dalam struktur yang sesuai dengan aplikasi, dengan fallback board jika API bermasalah.
 
-Penyimpanan Lokal – Menyimpan seluruh data board dan board aktif ke localStorage setiap kali ada perubahan, sehingga pengalaman pengguna tetap terjaga meskipun halaman di-refresh.
+- Penyimpanan Lokal – Menyimpan seluruh data board dan board aktif ke localStorage setiap kali ada perubahan, sehingga pengalaman pengguna tetap terjaga meskipun halaman di-refresh.
 
 🤝 Kontribusi
 Kontribusi sangat terbuka! Jika Anda menemukan bug atau memiliki ide untuk fitur baru, silakan buka issue atau kirim pull request.
