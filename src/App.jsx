@@ -5,18 +5,34 @@ import BoardColumns from './components/BoardColumns';
 import { fetchAllBoards } from './utils/api';
 import LoadingSpinner from './components/LoadingSpinner';
 
-// Komponen utama App
+/**
+ * Kunci untuk menyimpan data board dan ID board aktif ke localStorage.
+ */
+const STORAGE_KEY_BOARDS = 'task-manager-boards';
+const STORAGE_KEY_ACTIVE_BOARD = 'task-manager-active-board';
+
+/**
+ * Komponen utama aplikasi.
+ * Mengelola mode gelap (dark mode), pengambilan data board dari API atau localStorage,
+ * serta penyimpanan data board secara lokal.
+ */
 const App = () => {
-    // DESAIN: Dark mode state, diambil dari localStorage (default true)
+    // State mode gelap: baca dari localStorage, default true (gelap)
     const [darkMode, setDarkMode] = useState(() => {
         const saved = localStorage.getItem('theme');
         return saved === 'dark' || (!saved && true);
     });
+
+    // State untuk menyimpan seluruh data board (objek dengan key boardId)
     const [boardsData, setBoardsData] = useState(null);
+    // State untuk ID board yang sedang aktif
     const [activeBoardId, setActiveBoardId] = useState(null);
+    // State indikator loading
     const [loading, setLoading] = useState(true);
 
-    // Efek untuk menerapkan dark mode class ke html dan simpan ke localStorage
+    /**
+     * Efek: menerapkan class 'dark' pada elemen html dan menyimpan preferensi ke localStorage.
+     */
     useEffect(() => {
         if (darkMode) {
             document.documentElement.classList.add('dark');
@@ -27,27 +43,54 @@ const App = () => {
         }
     }, [darkMode]);
 
-    // Efek awal: mengambil data board dari API atau fallback
+    /**
+     * Efek awal: memuat data board dari localStorage (jika ada) atau dari API.
+     * Setelah data tersedia, loading diset false.
+     */
     useEffect(() => {
-        const loadBoards = async () => {
-            setLoading(true);
+        const loadData = async () => {
+            const storedBoards = localStorage.getItem(STORAGE_KEY_BOARDS);
+            const storedActiveBoard = localStorage.getItem(STORAGE_KEY_ACTIVE_BOARD);
+
+            if (storedBoards && storedActiveBoard) {
+                try {
+                    const boards = JSON.parse(storedBoards);
+                    setBoardsData(boards);
+                    setActiveBoardId(storedActiveBoard);
+                    setLoading(false);
+                    return;
+                } catch (error) {
+                    console.error('Gagal membaca localStorage:', error);
+                }
+            }
+
+            // Jika tidak ada di localStorage, ambil dari API
             const data = await fetchAllBoards();
             setBoardsData(data);
             const firstBoardId = Object.keys(data)[0];
             setActiveBoardId(firstBoardId);
             setLoading(false);
         };
-        loadBoards();
+
+        loadData();
     }, []);
+
+    /**
+     * Efek: menyimpan boardsData dan activeBoardId ke localStorage setiap kali berubah.
+     */
+    useEffect(() => {
+        if (boardsData && activeBoardId) {
+            localStorage.setItem(STORAGE_KEY_BOARDS, JSON.stringify(boardsData));
+            localStorage.setItem(STORAGE_KEY_ACTIVE_BOARD, activeBoardId);
+        }
+    }, [boardsData, activeBoardId]);
 
     if (loading) {
         return <LoadingSpinner />;
     }
 
     return (
-        // DESAIN: Container utama dengan min-height penuh, dark mode class
         <div className={`min-h-screen ${darkMode ? 'dark' : ''}`}>
-            {/* DESAIN: Flex container, padding 12px (p-3), background putih/gelap */}
             <div className="flex h-screen p-3 bg-white dark:bg-dark-bg">
                 <BoardsProvider
                     boards={boardsData}

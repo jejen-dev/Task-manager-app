@@ -3,7 +3,6 @@ import { useDrop } from 'react-dnd';
 import { useBoards } from '../contexts/BoardsContext';
 import TaskCard from './TaskCard';
 
-// Komponen kolom (satu kolom dari kanban board)
 const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
     const { addTask, moveTask } = useBoards();
     const [isAdding, setIsAdding] = useState(false);
@@ -11,7 +10,6 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
     const taskContainerRef = useRef(null);
     const [isOverflow, setIsOverflow] = useState(false);
 
-    // DESAIN: Drop target untuk menerima task dari kolom lain (antar kolom)
     const [, dropRef] = useDrop({
         accept: 'TASK',
         canDrop: (item) => item.sourceColumnId !== columnId,
@@ -26,7 +24,6 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         },
     });
 
-    // Fungsi untuk mengecek apakah container task overflow (scroll vertikal)
     const checkOverflow = () => {
         if (taskContainerRef.current) {
             const container = taskContainerRef.current;
@@ -61,7 +58,6 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         setIsAdding(false);
     };
 
-    // Tentukan border radius khusus untuk kolom pertama dan terakhir
     let borderRadiusClass = '';
     if (columnId === 'Backlog') {
         borderRadiusClass = 'rounded-l-lg rounded-r-none';
@@ -69,10 +65,6 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         borderRadiusClass = 'rounded-r-lg rounded-l-none';
     }
 
-    // --- Penyesuaian padding berdasarkan kolom ---
-    // Backlog: padding kanan 0, kiri tetap 12px
-    // In Progress & In Review: padding kiri dan kanan 0
-    // Completed: padding kiri 0, kanan tetap 12px
     let headerPaddingClass = '';
     let taskContainerPaddingClass = '';
     let footerPaddingClass = '';
@@ -85,7 +77,7 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
         headerPaddingClass = 'pl-0 pr-3 pt-4 pb-5';
         taskContainerPaddingClass = 'pl-0 pr-3';
         footerPaddingClass = 'pl-0 pr-3';
-    } else { // In Progress & In Review
+    } else {
         headerPaddingClass = 'px-0 pt-4 pb-5';
         taskContainerPaddingClass = 'px-0';
         footerPaddingClass = 'px-0';
@@ -93,29 +85,24 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
     // -------------------------------------------
 
     return (
-        // DESAIN: Kolom: background #EEF4FC (light) / #3A3E44 (dark), border radius 12px (rounded-lg)
         <div
             ref={dropRef}
             className={`bg-[#EEF4FC] dark:bg-[#3A3E44] flex flex-col overflow-hidden h-full ${borderRadiusClass}`}
             style={{ borderRadius: '12px', position: 'relative' }}
         >
-            {/* DESAIN: Header kolom: padding atas 16px, kiri/kanan 12px, bawah 8px (disesuaikan per kolom) */}
             <div className={headerPaddingClass}>
                 <div className="flex items-center gap-2">
-                    {/* Titik warna status ukuran 8x8 (w-2 h-2) */}
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }}></div>
                     <h3 className="font-semibold text-black dark:text-white text-sm">{title}</h3>
                     <span className="text-sm text-black dark:text-white">({tasks.length})</span>
                 </div>
             </div>
 
-            {/* DESAIN: Daftar task dengan scroll vertikal jika overflow. Padding kiri/kanan 12px (disesuaikan) */}
             <div
                 ref={taskContainerRef}
                 className={`${isOverflow ? 'flex-1' : ''} overflow-y-auto ${taskContainerPaddingClass} hide-scrollbar`}
                 style={{ minHeight: 0 }}
             >
-                {/* DESAIN: Jarak antar task 20px (space-y-5), padding bawah 12px (pb-3) */}
                 <div className="space-y-5 pb-5">
                     {tasks.length === 0 ? (
                         <div className="text-left text-[#7E878D] bg-transparent">No tasks</div>
@@ -127,7 +114,6 @@ const Column = ({ columnId, title, tasks, color, activeBoardId }) => {
                 </div>
             </div>
 
-            {/* DESAIN: Tombol add task (hanya untuk kolom Backlog) - sticky jika overflow */}
             <div className={`${isOverflow ? 'sticky bottom-0 bg-[#EEF4FC] dark:bg-[#3A3E44]' : ''} ${footerPaddingClass} pt-0 pb-4 ${isOverflow ? 'mt-5' : ''}`}>
                 {columnId === 'Backlog' && !isAdding && (
                     <button

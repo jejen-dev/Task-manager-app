@@ -3,20 +3,17 @@ import { useDrag, useDrop } from 'react-dnd';
 import { useBoards } from '../contexts/BoardsContext';
 import TaskEditModal from './TaskEditModal';
 
-// Komponen card untuk setiap task (dapat di-drag dan di-drop)
 const TaskCard = ({ task, index, columnId }) => {
     const { activeBoardId, moveTask } = useBoards();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const ref = useRef(null);
 
-    // Drag source: memungkinkan task di-drag
     const [{ isDragging }, dragRef] = useDrag({
         type: 'TASK',
         item: () => ({ taskId: task.id, sourceColumnId: columnId, sourceIndex: index }),
         collect: (monitor) => ({ isDragging: !!monitor.isDragging() }),
     });
 
-    // Drop target untuk reordering dalam satu kolom (mengubah urutan)
     const [{ isOver }, dropRef] = useDrop({
         accept: 'TASK',
         hover: (item, monitor) => {
@@ -48,7 +45,6 @@ const TaskCard = ({ task, index, columnId }) => {
 
     dragRef(dropRef(ref));
 
-    // Warna untuk setiap tag (berdasarkan nama)
     const tagColors = {
         'Concept': { bg: '#F9E4E3', text: '#B64B44' },
         'Technical': { bg: '#DEE9FC', text: '#5076E7' },
@@ -67,7 +63,6 @@ const TaskCard = ({ task, index, columnId }) => {
 
     return (
         <>
-            {/* DESAIN: Task card: background putih/gelap, border radius 12px, padding 12px (p-3), margin bottom diatur oleh parent (space-y-5) */}
             <div
                 ref={ref}
                 onClick={handleClick}
@@ -76,13 +71,10 @@ const TaskCard = ({ task, index, columnId }) => {
                     ${isOver ? 'border-2 border-blue-400' : ''}`}
                 style={{ borderRadius: '12px' }}
             >
-                {/* DESAIN: Cover image jika ada: lebar penuh, tinggi 128px (h-32), object cover, border radius 8px (rounded-md), margin bottom 12px (mb-3) */}
                 {task.coverImage && (
                     <img src={task.coverImage} alt="Task cover" className="w-full h-32 object-cover rounded-md mb-3" style={{ borderRadius: '8px' }} />
                 )}
-                {/* DESAIN: Nama task: teks 14px (text-sm), margin bottom 12px (mb-3) */}
                 <h4 className="text-sm font-medium text-black dark:text-white mb-3 break-words">{truncateTaskName(task.name)}</h4>
-                {/* DESAIN: Tags: flex wrap, gap 4px (gap-1). Setiap tag: ukuran 44x14 (lebar 44px, tinggi 14px), text size 8px, border radius 4px */}
                 {task.tags && task.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                         {task.tags.map(tag => (
@@ -96,7 +88,7 @@ const TaskCard = ({ task, index, columnId }) => {
                                     backgroundColor: tagColors[tag]?.bg,
                                     color: tagColors[tag]?.text,
                                     width: tag === 'Front-end' ? 'auto' : '44px',
-                                    height: '14px',  // semua tag tinggi 14px
+                                    height: '14px',
                                     borderRadius: '4px'
                                 }}
                             >

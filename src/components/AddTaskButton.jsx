@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { useBoards } from '../contexts/BoardsContext';
 
-// Komponen tombol untuk menambah task baru (berada di bawah sidebar)
-// Mode default: tombol biru dengan teks "Add New Task" dan icon plus
-// Mode input: form dengan input task name dan tombol Add/Cancel
 const AddTaskButton = () => {
     const { addTask, activeBoardId } = useBoards();
     const [isAdding, setIsAdding] = useState(false);
     const [taskName, setTaskName] = useState('');
 
-    // Fungsi untuk menambah task setelah validasi
     const handleAddTask = () => {
         const trimmed = taskName.trim();
         if (trimmed === '') {
@@ -25,7 +21,6 @@ const AddTaskButton = () => {
         setIsAdding(false);
     };
 
-    // DESAIN: Tombol default (tidak menambah) - background biru, icon 20x20, teks 14px?
     if (!isAdding) {
         return (
             <button
@@ -38,10 +33,8 @@ const AddTaskButton = () => {
         );
     }
 
-    // DESAIN: Mode input - form dengan input dan tombol, background putih/gelap, border radius 12px
     return (
         <div className="bg-light-card dark:bg-dark-card rounded-lg p-4 shadow-md">
-            {/* DESAIN: Input task name, border radius 12px, mendukung tombol Enter */}
             <input
                 type="text"
                 value={taskName}

@@ -2,6 +2,10 @@ import React, { createContext, useContext, useCallback } from 'react';
 
 const BoardsContext = createContext();
 
+/**
+ * Hook untuk mengakses context Boards.
+ * @throws {Error} Jika digunakan di luar BoardsProvider.
+ */
 export const useBoards = () => {
     const context = useContext(BoardsContext);
     if (!context) {
@@ -10,6 +14,9 @@ export const useBoards = () => {
     return context;
 };
 
+/**
+ * Provider untuk state board, mencakup data board, board aktif, dan berbagai operasi.
+ */
 export const BoardsProvider = ({
     children,
     boards,
@@ -17,12 +24,16 @@ export const BoardsProvider = ({
     activeBoardId,
     setActiveBoardId
 }) => {
-    // Mendapatkan board aktif
+    /**
+     * Mengembalikan objek board yang sedang aktif.
+     */
     const getActiveBoard = useCallback(() => {
         return boards[activeBoardId];
     }, [boards, activeBoardId]);
 
-    // Update board tertentu
+    /**
+     * Memperbarui data sebuah board berdasarkan boardId.
+     */
     const updateBoard = useCallback((boardId, updatedBoard) => {
         setBoards(prev => ({
             ...prev,
@@ -30,7 +41,10 @@ export const BoardsProvider = ({
         }));
     }, [setBoards]);
 
-    // Memindahkan task antar kolom (drag & drop)
+    /**
+     * Memindahkan task antar kolom (drag & drop).
+     * Memperbarui status task sesuai kolom tujuan.
+     */
     const moveTask = useCallback((boardId, sourceCol, destCol, sourceIndex, destIndex) => {
         setBoards(prevBoards => {
             const board = prevBoards[boardId];
@@ -40,7 +54,6 @@ export const BoardsProvider = ({
             const destTasks = sourceCol === destCol ? sourceTasks : [...board.columns[destCol]];
             const [movedTask] = sourceTasks.splice(sourceIndex, 1);
 
-            // Update status task sesuai kolom tujuan
             const updatedTask = { ...movedTask, status: destCol };
 
             if (sourceCol === destCol) {
@@ -72,7 +85,9 @@ export const BoardsProvider = ({
         });
     }, [setBoards]);
 
-    // Menambah task baru ke kolom Backlog
+    /**
+     * Menambahkan task baru ke kolom 'Backlog' pada board yang ditentukan.
+     */
     const addTask = useCallback((boardId, taskName) => {
         if (!taskName.trim()) return;
 
@@ -101,18 +116,19 @@ export const BoardsProvider = ({
         });
     }, [setBoards]);
 
-    // !!! PERUBAHAN: Mengupdate task dan memindahkannya ke kolom yang sesuai jika status berubah
+    /**
+     * Memperbarui task: mencari task berdasarkan ID, menghapus dari kolom asal,
+     * lalu menambahkannya ke kolom berdasarkan status baru (jika status berubah).
+     */
     const updateTask = useCallback((boardId, taskId, updatedFields) => {
         setBoards(prevBoards => {
             const board = prevBoards[boardId];
             if (!board) return prevBoards;
 
-            // Salin kolom
             const columns = { ...board.columns };
             let taskToUpdate = null;
             let oldStatus = null;
 
-            // 1. Cari task di semua kolom dan hapus dari kolom asalnya
             for (const [status, tasks] of Object.entries(columns)) {
                 const taskIndex = tasks.findIndex(t => t.id === taskId);
                 if (taskIndex !== -1) {
@@ -127,16 +143,13 @@ export const BoardsProvider = ({
 
             if (!taskToUpdate) return prevBoards;
 
-            // 2. Tentukan status baru (jika diubah, pakai updatedFields.status, jika tidak pakai status lama)
             const newStatus = updatedFields.status !== undefined ? updatedFields.status : oldStatus;
 
-            // 3. Masukkan task ke kolom yang sesuai dengan status baru
             if (!columns[newStatus]) {
                 columns[newStatus] = [];
             }
             columns[newStatus] = [...columns[newStatus], taskToUpdate];
 
-            // 4. Kembalikan state baru
             return {
                 ...prevBoards,
                 [boardId]: {
@@ -147,7 +160,10 @@ export const BoardsProvider = ({
         });
     }, [setBoards]);
 
-    // Menambah board baru
+    /**
+     * Menambahkan board baru dengan nama dan logo (emoji) tertentu.
+     * Board baru akan otomatis menjadi board aktif.
+     */
     const addBoard = useCallback((boardName, logoUrl) => {
         const newBoardId = `board-${Date.now()}`;
         const newBoard = {
@@ -169,7 +185,10 @@ export const BoardsProvider = ({
         setActiveBoardId(newBoardId);
     }, [setBoards, setActiveBoardId]);
 
-    // Menghapus board, tidak boleh jika hanya tersisa satu
+    /**
+     * Menghapus board berdasarkan ID.
+     * Tidak mengizinkan penghapusan jika hanya tersisa satu board.
+     */
     const deleteBoard = useCallback((boardId) => {
         const boardIds = Object.keys(boards);
         if (boardIds.length <= 1) {

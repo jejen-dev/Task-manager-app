@@ -1,11 +1,9 @@
 import React from 'react';
 import { useBoards } from '../contexts/BoardsContext';
 
-// Komponen daftar board (digunakan di Sidebar mode detail)
 const BoardList = () => {
     const { boards, activeBoardId, setActiveBoardId, deleteBoard } = useBoards();
 
-    // Hapus board dengan konfirmasi, stopPropagation agar tidak memicu klik board
     const handleDelete = (boardId, e) => {
         e.stopPropagation();
         if (window.confirm('Are you sure you want to delete this board?')) {
@@ -13,7 +11,6 @@ const BoardList = () => {
         }
     };
 
-    // Memotong nama board jika lebih dari 25 karakter
     const truncateBoardName = (name) => {
         if (name.length > 25) return name.substring(0, 25) + '...';
         return name;
@@ -22,8 +19,6 @@ const BoardList = () => {
     return (
         <div className="space-y-2">
             {Object.values(boards).map((board) => (
-                // DESAIN: Setiap item board: lebar 272px, tinggi 48px, border radius 45px (rounded-[45px])
-                // Board aktif: background transparan, border solid #3662E3; board tidak aktif: hover background abu-abu
                 <div
                     key={board.id}
                     onClick={() => setActiveBoardId(board.id)}
@@ -33,14 +28,11 @@ const BoardList = () => {
                         }`}
                 >
                     <div className="flex items-center gap-3 flex-1 min-w-0 pl-2 pr-2">
-                        {/* DESAIN: Icon board ukuran 32x32 (w-8 h-8), rounded-full */}
                         <img src={board.logoUrl} alt={board.name} className="w-8 h-8 rounded-full flex-shrink-0" />
-                        {/* DESAIN: Nama board: teks 14px (text-sm), padding atas/bawah 15px, kiri 10px */}
                         <span className="text-black dark:text-dark-text font-medium text-sm py-[15px] pl-2.5 truncate">
                             {truncateBoardName(board.name)}
                         </span>
                     </div>
-                    {/* DESAIN: Tombol hapus (X) hanya muncul jika jumlah board > 1 */}
                     {Object.keys(boards).length > 1 && (
                         <button onClick={(e) => handleDelete(board.id, e)} className="text-red-950 dark:text-red-950 hover:text-red-800 dark:hover:text-red-800 flex-shrink-0 mr-2">
                             <img src="/resources/icons/Close_round.svg" alt="Delete" className="w-4 h-4" brightness="0" />

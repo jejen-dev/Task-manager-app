@@ -69,8 +69,8 @@ const AddBoardModal = ({ onClose, onAddBoard }) => {
                                     key={idx}
                                     onClick={() => setSelectedLogo(logo)}
                                     className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full focus:outline-none transition-all ${selectedLogo === logo
-                                            ? 'ring-2 ring-[#3662E3] ring-offset-2 ring-offset-white dark:ring-offset-dark-card'
-                                            : ''
+                                        ? 'ring-2 ring-[#3662E3] ring-offset-2 ring-offset-white dark:ring-offset-dark-card'
+                                        : ''
                                         }`}
                                 >
                                     <img

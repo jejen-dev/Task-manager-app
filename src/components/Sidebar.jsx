@@ -3,7 +3,6 @@ import { useBoards } from '../contexts/BoardsContext';
 import BoardList from './BoardList';
 import AddBoardModal from './AddBoardModal';
 
-// Komponen Sidebar (menu kiri aplikasi)
 const Sidebar = ({ darkMode, setDarkMode }) => {
     const { boards, activeBoardId, setActiveBoardId, addBoard } = useBoards();
     const [showDetails, setShowDetails] = useState(false);
@@ -30,7 +29,6 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                     </button>
 
                     {!showDetails ? (
-                        // Mode ringkas: hanya icon board, tombol tambah board, dan dark mode toggle
                         <>
                             <div className="flex flex-col items-center gap-3 overflow-y-auto hide-scrollbar p-1">
                                 {Object.values(boards).map((board) => (
@@ -58,13 +56,10 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                             </div>
                         </>
                     ) : (
-                        // Mode detail - struktur diubah agar tombol tidak sticky dan urutan sama dengan mode ringkas
                         <>
-                            {/* !!!!!!GUUUBBBLKKK!!!!!! Hapus flex-1 dari BoardList, cukup overflow auto */}
                             <div className="overflow-y-auto hide-scrollbar relative">
                                 <BoardList />
                             </div>
-                            {/* !!!!!!GUUUBBBLKKK!!!!!! Tombol Add new board di luar scroll, tanpa sticky */}
                             <div className="pt-2 pb-2">
                                 <button
                                     onClick={() => setShowModal(true)}
@@ -74,9 +69,7 @@ const Sidebar = ({ darkMode, setDarkMode }) => {
                                     <span>Add new board</span>
                                 </button>
                             </div>
-                            {/* !!!!!!GUUUBBBLKKK!!!!!! Spacer agar toggle turun saat board sedikit */}
                             <div className="flex-1"></div>
-                            {/* Toggle mode terang/gelap */}
                             <div className="bg-[#EEF4FC] dark:bg-[#3A3E44] rounded-lg p-1 flex gap-1 w-full h-12 mt-2">
                                 <button
                                     onClick={() => setDarkMode(true)}

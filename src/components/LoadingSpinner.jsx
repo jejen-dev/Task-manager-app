@@ -1,7 +1,5 @@
 import React from 'react';
 
-// Komponen spinner loading (ditampilkan saat mengambil data dari API)
-// DESAIN: Flex center di tengah layar, animasi spin, lingkaran biru dengan border bawah
 const LoadingSpinner = () => {
     return (
         <div className="flex items-center justify-center min-h-screen">

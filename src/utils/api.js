@@ -1,9 +1,13 @@
 import axios from 'axios';
 
-// URL endpoint dari devChallenges.io (sesuai challenge)
+/**
+ * URL endpoint daftar board dari devChallenges.io.
+ */
 const BOARD_LIST_URL = 'https://raw.githubusercontent.com/devchallenges-io/curriculum/refs/heads/main/4-frontend-libaries/challenges/group_1/data/task-manager/list.json';
 
-// Daftar emoji logo yang tersedia
+/**
+ * Daftar path emoji logo yang tersedia untuk board.
+ */
 const EMOJI_LOGOS = [
     '/resources/emojis/board-logo-01.png',
     '/resources/emojis/board-logo-02.png',
@@ -21,12 +25,14 @@ const EMOJI_LOGOS = [
 ];
 
 /**
- * Mengambil semua data board dari API
- * @returns {Promise<Object>} boardsData - Objek dengan key boardId berisi detail board
+ * Mengambil semua data board dari API.
+ * - Ambil daftar board dari BOARD_LIST_URL.
+ * - Untuk setiap board, ambil detail dan transform tasks menjadi kolom (Backlog, In Progress, In Review, Completed).
+ * - Setiap board diberi logo secara acak dari EMOJI_LOGOS.
+ * @returns {Promise<Object>} Objek dengan key boardId berisi detail board.
  */
 export const fetchAllBoards = async () => {
     try {
-        // 1. Ambil daftar board
         const listResponse = await axios.get(BOARD_LIST_URL);
         const boardList = listResponse.data.boards;
 
@@ -36,13 +42,11 @@ export const fetchAllBoards = async () => {
 
         const boardsData = {};
 
-        // 2. Ambil detail setiap board
         for (const boardInfo of boardList) {
             try {
                 const detailResponse = await axios.get(boardInfo.url);
                 const boardDetail = detailResponse.data;
 
-                // Transformasi tasks menjadi kolom (Backlog, In Progress, In Review, Completed)
                 const columns = {
                     'Backlog': [],
                     'In Progress': [],
@@ -50,16 +54,13 @@ export const fetchAllBoards = async () => {
                     'Completed': []
                 };
 
-                // Pastikan boardDetail.tasks ada dan berupa array
                 if (boardDetail.tasks && Array.isArray(boardDetail.tasks)) {
                     boardDetail.tasks.forEach(task => {
-                        // Validasi status task, jika tidak dikenal, default ke 'Backlog'
                         let status = task.status;
                         if (!columns.hasOwnProperty(status)) {
                             status = 'Backlog';
                         }
 
-                        // Format task sesuai yang digunakan di komponen
                         const formattedTask = {
                             id: task.id?.toString() || Date.now().toString(),
                             name: task.name || 'Untitled Task',
@@ -71,7 +72,6 @@ export const fetchAllBoards = async () => {
                     });
                 }
 
-                // Pilih logo random dari daftar emoji
                 const randomLogo = EMOJI_LOGOS[Math.floor(Math.random() * EMOJI_LOGOS.length)];
 
                 boardsData[boardInfo.id] = {
@@ -82,12 +82,10 @@ export const fetchAllBoards = async () => {
                 };
             } catch (error) {
                 console.error(`Error fetching board detail for ${boardInfo.id}:`, error);
-                // Jika satu board gagal, kita tetap lanjut ke board lain
                 boardsData[boardInfo.id] = getEmptyBoard(boardInfo.id, boardInfo.name);
             }
         }
 
-        // Jika tidak ada board sama sekali, gunakan fallback
         if (Object.keys(boardsData).length === 0) {
             return getFallbackBoards();
         }
@@ -95,13 +93,15 @@ export const fetchAllBoards = async () => {
         return boardsData;
     } catch (error) {
         console.error('Error fetching board list:', error);
-        // Fallback jika API gagal total
         return getFallbackBoards();
     }
 };
 
 /**
- * Membuat board kosong (tanpa task) dengan format yang benar
+ * Membuat board kosong (tanpa task) dengan format yang benar.
+ * @param {string} id - ID board.
+ * @param {string} name - Nama board.
+ * @returns {Object} Board kosong dengan empat kolom.
  */
 const getEmptyBoard = (id, name) => {
     return {
@@ -118,8 +118,9 @@ const getEmptyBoard = (id, name) => {
 };
 
 /**
- * Data fallback jika API tidak dapat dijangkau
- * Sudah ditambahkan task "Default task" dengan tag "Concept"
+ * Data fallback jika API tidak dapat dijangkau.
+ * Berisi beberapa board contoh dengan task default.
+ * @returns {Object} Objek board fallback.
  */
 const getFallbackBoards = () => {
     return {
